@@ -1,3 +1,6 @@
+# Bỏ qua env
+.env
+
 # Bỏ qua môi trường ảo và file tạm của Python
 venv/
 __pycache__/
