@@ -1,0 +1,11 @@
+# Bỏ qua môi trường ảo và file tạm của Python
+venv/
+__pycache__/
+*.pyc
+
+# Bỏ qua các thư mục chứa mô hình LLM (Cực kỳ nặng)
+cloud-models/
+edge-models/
+
+# Bỏ qua các file log hoặc database tạm nếu có
+*.log

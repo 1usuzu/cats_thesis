@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  cloud-node:
+    image: ollama/ollama
+    container_name: cloud-node
+    runtime: nvidia
+    environment:
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_QUEUE=50
+      - OLLAMA_KEEP_ALIVE=-1
+      - OLLAMA_KV_CACHE_TYPE=q8_0
+    cpuset: "0,1,2,3,4,5"
+    volumes:
+      - ./cloud-models:/root/.ollama
+      - ./cloud-node/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/entrypoint.sh"]
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  edge-node:
+    image: ollama/ollama
+    container_name: edge-node
+    environment:
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_QUEUE=50
+      - OLLAMA_KEEP_ALIVE=-1
+      - OLLAMA_MAX_LOADED_MODELS=2
+    cpuset: "0,1,2,3,4,5"
+    volumes:
+      - ./edge-models:/root/.ollama
+      - ./edge-node/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/entrypoint.sh"]
+    ports:
+      - "11435:11434"
+
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy
+    container_name: toxiproxy
+    ports:
+      - "8474:8474"   # Toxiproxy API
+      - "8001:8001"   # Cloud proxy port
+      - "8002:8002"   # Edge proxy port
