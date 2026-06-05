@@ -10,10 +10,6 @@ __pycache__/
 *.pyd
 .pytest_cache/
 
-# Agent/AI Tooling
-.agent/
-.agents/
-
 # Cấu hình hệ điều hành
 .DS_Store
 Thumbs.db
