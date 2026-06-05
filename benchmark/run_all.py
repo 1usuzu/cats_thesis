@@ -4,6 +4,9 @@ import asyncio
 import subprocess
 import time
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 # Import isolation logic
 from isolation import prepare_experiment_state

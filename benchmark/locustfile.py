@@ -1,7 +1,11 @@
 import json
 import os
 import random
+from pathlib import Path
+from dotenv import load_dotenv
 from locust import HttpUser, task, between, events
+
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 # Load prompts
 try:

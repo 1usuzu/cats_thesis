@@ -5,6 +5,9 @@ import time
 import re
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 # Add network directory to path so we can import profiles
 network_dir = Path(__file__).parent.parent / "network"

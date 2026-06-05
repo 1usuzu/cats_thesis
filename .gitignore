@@ -3,11 +3,16 @@
 env/
 venv/
 
-# Cache của Python
+# Cache của Python & Testing
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.pytest_cache/
+
+# Agent/AI Tooling
+.agent/
+.agents/
 
 # Cấu hình hệ điều hành
 .DS_Store

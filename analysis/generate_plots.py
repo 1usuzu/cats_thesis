@@ -65,24 +65,24 @@ def generate_plots():
             print(f"Warning: {filepath} is empty or missing expected columns.")
             continue
             
-        # Overall stats from Aggregated row
-        agg_row = df[df["Name"] == "Aggregated"]
-        if agg_row.empty:
-            continue
-        agg_row = agg_row.iloc[0]
+        # Overall stats from POST /v1/chat row
+        main_row = df[(df["Name"] == "/v1/chat") & (df["Type"] == "POST")]
+        if main_row.empty:
+            main_row = df[df["Name"] == "Aggregated"]
+        main_row = main_row.iloc[0]
         
-        req_count = float(agg_row.get("Request Count", 0))
-        fail_count = float(agg_row.get("Failure Count", 0))
-        p99_latency = float(agg_row.get("99%", 0))
+        req_count = float(main_row.get("Request Count", 0))
+        fail_count = float(main_row.get("Failure Count", 0))
+        p99_latency = float(main_row.get("99%", 0))
         
         # 100% Failure detection
         catastrophic = (req_count > 0 and req_count == fail_count)
         
-        sla_violations = estimate_sla_violations(agg_row)
+        sla_violations = estimate_sla_violations(main_row)
         
         # Debug print for BAD profile
         if profile.upper() == "BAD":
-            max_resp = float(agg_row.get("Max Response Time", 0))
+            max_resp = float(main_row.get("Max Response Time", 0))
             print(f"[DEBUG] Profile: {profile.upper()} | Strategy: {strategy} | Load: {load}")
             print(f"        Max Response Time: {max_resp} ms | Estimated SLA Violations: {sla_violations}")
         
