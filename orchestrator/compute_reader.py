@@ -1,89 +1,88 @@
-import time
-import requests
-import subprocess
-import threading
+"""Async reader for compute metrics (CPU, GPU, Queue)."""
+
+import asyncio
+import structlog
+import httpx
+
 from metrics_cache import metrics_cache
+from config import settings
 
-# Control Plane URLs (Bypass Toxiproxy)
-CLOUD_METRICS_URL = "http://localhost:11434"
-EDGE_METRICS_URL = "http://localhost:11435"
+logger = structlog.get_logger("compute_reader")
 
-def get_cpu_utilization():
-    """Tính toán % CPU sử dụng dựa trên /proc/stat của Linux"""
+async def get_cpu_utilization() -> float:
     def read_cpu_stats():
-        with open('/proc/stat', 'r') as f:
-            lines = f.readlines()
-        for line in lines:
-            if line.startswith('cpu '):
-                parts = [int(i) for i in line.split()[1:]]
-                idle = parts[3] + parts[4] # idle + iowait
-                total = sum(parts)
-                return idle, total
+        try:
+            with open("/proc/stat", "r") as f:
+                for line in f:
+                    if line.startswith("cpu "):
+                        parts = [int(i) for i in line.split()[1:]]
+                        idle = parts[3] + parts[4]
+                        total = sum(parts)
+                        return idle, total
+        except FileNotFoundError:
+            pass
         return 0, 0
 
     idle1, total1 = read_cpu_stats()
-    time.sleep(0.1) # Lấy mẫu chênh lệch 100ms
+    await asyncio.sleep(0.1)
     idle2, total2 = read_cpu_stats()
-    
+
     total_delta = total2 - total1
+    if total_delta == 0:
+        return 0.0
     idle_delta = idle2 - idle1
-    if total_delta == 0: return 0.0
     return 100.0 * (1.0 - idle_delta / total_delta)
 
-def fetch_compute_util():
-    """Luồng 1: Đọc GPU (Cloud) và CPU (Edge) mỗi 2 giây"""
+async def fetch_compute_util():
     while True:
         try:
-            # 1. Đọc GPU cho Cloud-node (Bỏ qua lỗi in ra màn hình nếu GPU đang ngủ)
+            # GPU utilization for cloud-node via asyncio.create_subprocess_exec
             try:
-                gpu_out = subprocess.check_output(
-                    ["nvidia-smi", "--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"], 
-                    encoding="utf-8",
-                    stderr=subprocess.DEVNULL # Chặn các log lỗi đỏ quạch từ hệ điều hành
+                proc = await asyncio.create_subprocess_exec(
+                    "nvidia-smi",
+                    "--query-gpu=utilization.gpu",
+                    "--format=csv,noheader,nounits",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.DEVNULL
                 )
-                gpu_util = float(gpu_out.strip())
-                metrics_cache.update("cloud_gpu_util", gpu_util)
-            except subprocess.CalledProcessError:
-                # GPU Laptop đang ngủ (Mã lỗi 18) -> Tải mặc định là 0%
+                stdout, _ = await proc.communicate()
+                
+                if proc.returncode == 0 and stdout:
+                    gpu_util = float(stdout.decode().strip())
+                    metrics_cache.update("cloud_gpu_util", gpu_util)
+                else:
+                    metrics_cache.update("cloud_gpu_util", 0.0)
+            except FileNotFoundError:
                 metrics_cache.update("cloud_gpu_util", 0.0)
 
-            # 2. Đọc CPU cho Edge-node
-            cpu_util = get_cpu_utilization()
+            # CPU utilization for edge-node
+            cpu_util = await get_cpu_utilization()
             metrics_cache.update("edge_cpu_util", round(cpu_util, 2))
 
+        except asyncio.CancelledError:
+            break
         except Exception as e:
-            print(f"Lỗi đọc Compute: {e}")
-            
-        time.sleep(2)
+            logger.error("Compute reader error", error=str(e))
 
-def fetch_queue_depth():
-    """Luồng 2: Đọc trạng thái Ollama mỗi 0.5 giây"""
-    while True:
-        try:
-            # Lưu ý: Ollama API tiêu chuẩn không trả về độ dài queue trực tiếp trong /api/ps.
-            # Trong giai đoạn benchmark, gateway sẽ tự đo concurrent requests. 
-            # Ở đây ta check API /api/ps để đảm bảo Control Plane connection đang sống (< 1ms).
-            requests.get(f"{CLOUD_METRICS_URL}/api/ps", timeout=1)
-            requests.get(f"{EDGE_METRICS_URL}/api/ps", timeout=1)
-            
-            # (Queue depth thực tế sẽ được Gateway Middleware bơm vào bộ nhớ cache sau khi nhận request)
-            
-        except Exception as e:
-            print(f"Lỗi đọc Queue: {e}")
-            
-        time.sleep(0.5)
+        await asyncio.sleep(settings.compute_metrics_interval_s)
 
-def start_compute_reader():
-    threading.Thread(target=fetch_compute_util, daemon=True).start()
-    threading.Thread(target=fetch_queue_depth, daemon=True).start()
+def start_compute_reader() -> list[asyncio.Task]:
+    """Start compute utilization reader as asyncio task."""
+    t1 = asyncio.create_task(fetch_compute_util())
+    return [t1]
 
-# Cấu hình test độc lập
 if __name__ == "__main__":
-    print("Đang khởi động Compute Reader...")
-    start_compute_reader()
-    while True:
-        data = metrics_cache.get_all()
-        print(f"Tải Cloud (GPU): {data['cloud_gpu_util']}%")
-        print(f"Tải Edge  (CPU): {data['edge_cpu_util']}%")
-        print("-" * 30)
-        time.sleep(2)
+    async def main():
+        tasks = start_compute_reader()
+        try:
+            while True:
+                data = metrics_cache.get_all()
+                print(f"Cloud GPU: {data.get('cloud_gpu_util')}%")
+                print(f"Edge CPU:  {data.get('edge_cpu_util')}%")
+                print("-" * 30)
+                await asyncio.sleep(2)
+        except KeyboardInterrupt:
+            for t in tasks:
+                t.cancel()
+
+    asyncio.run(main())

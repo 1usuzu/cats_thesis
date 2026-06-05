@@ -1,0 +1,94 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Network Latency (Declared)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [
+        {"expr": "cats_network_latency_ms{site=\"cloud\"}", "legendFormat": "Cloud Latency"},
+        {"expr": "cats_network_latency_ms{site=\"edge\"}", "legendFormat": "Edge Latency"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ms"}}
+    },
+    {
+      "title": "Bandwidth (Declared)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [
+        {"expr": "cats_network_bandwidth_kbps{site=\"cloud\"}", "legendFormat": "Cloud BW"},
+        {"expr": "cats_network_bandwidth_kbps{site=\"edge\"}", "legendFormat": "Edge BW"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "kbps"}}
+    },
+    {
+      "title": "Queue Depth per Site",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {"expr": "cats_compute_queue_depth{site=\"cloud\"}", "legendFormat": "Cloud Queue"},
+        {"expr": "cats_compute_queue_depth{site=\"edge\"}", "legendFormat": "Edge Queue"}
+      ]
+    },
+    {
+      "title": "GPU / CPU Utilization",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [
+        {"expr": "cats_compute_gpu_util_pct", "legendFormat": "Cloud GPU %"},
+        {"expr": "cats_compute_cpu_util_pct", "legendFormat": "Edge CPU %"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "percent", "max": 100}}
+    },
+    {
+      "title": "TTFT Moving Average",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {"expr": "cats_compute_ttft_ms{site=\"cloud\"}", "legendFormat": "Cloud TTFT"},
+        {"expr": "cats_compute_ttft_ms{site=\"edge\"}", "legendFormat": "Edge TTFT"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "ms"}}
+    },
+    {
+      "title": "Requests per Second",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [
+        {"expr": "cats_gateway_rps", "legendFormat": "Current RPS"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "reqps"}}
+    },
+    {
+      "title": "Routing Distribution",
+      "type": "piechart",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "targets": [
+        {"expr": "cats_routing_total{site=\"cloud\"}", "legendFormat": "Cloud"},
+        {"expr": "cats_routing_total{site=\"edge\"}", "legendFormat": "Edge"}
+      ]
+    },
+    {
+      "title": "Tier-1 System State",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "targets": [
+        {"expr": "cats_tier1_state_info", "legendFormat": "{{state}}"}
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["cats", "llm", "orchestrator"],
+  "templating": {"list": []},
+  "time": {"from": "now-30m", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "CATS LLM Orchestrator Dashboard",
+  "uid": "cats-main",
+  "version": 1
+}

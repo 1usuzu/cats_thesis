@@ -1,14 +1,29 @@
-# Bỏ qua env
+# Môi trường ảo và cấu hình cục bộ
 .env
-
-# Bỏ qua môi trường ảo và file tạm của Python
+env/
 venv/
+
+# Cache của Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# Bỏ qua các thư mục chứa mô hình LLM (Cực kỳ nặng)
+# Cấu hình hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Dữ liệu LLM Model
 cloud-models/
 edge-models/
 
-# Bỏ qua các file log hoặc database tạm nếu có
+# Log
 *.log
+
+# Dữ liệu rác của Docker (Mount volumes)
+prometheus-data/
+grafana-data/
+
+# NGOẠI LỆ: Giữ lại minh chứng biểu đồ và kết quả chạy
+!analysis/plots/
+!benchmark/results/

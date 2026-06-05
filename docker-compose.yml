@@ -1,50 +1,230 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  # === LLM INFERENCE NODES ===
+
   cloud-node:
-    image: ollama/ollama
-    container_name: cloud-node
+    image: ollama/ollama:latest
     runtime: nvidia
     environment:
       - OLLAMA_NUM_PARALLEL=2
       - OLLAMA_MAX_QUEUE=50
       - OLLAMA_KEEP_ALIVE=-1
       - OLLAMA_KV_CACHE_TYPE=q8_0
-    cpuset: "0,1,2,3,4,5"
     volumes:
-      - ./cloud-models:/root/.ollama
+      - cloud-models:/root/.ollama
       - ./cloud-node/entrypoint.sh:/entrypoint.sh
-    entrypoint: ["/entrypoint.sh"]
+    entrypoint: [ "/bin/bash", "/entrypoint.sh" ]
     ports:
       - "11434:11434"
+    networks:
+      - data-plane
+      - control-plane
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [gpu]
+              capabilities: [ gpu ]
+        limits:
+          cpus: "6.0"
 
   edge-node:
-    image: ollama/ollama
-    container_name: edge-node
+    image: ollama/ollama:latest
     environment:
       - OLLAMA_NUM_PARALLEL=2
       - OLLAMA_MAX_QUEUE=50
       - OLLAMA_KEEP_ALIVE=-1
       - OLLAMA_MAX_LOADED_MODELS=2
-    cpuset: "0,1,2,3,4,5"
     volumes:
-      - ./edge-models:/root/.ollama
+      - edge-models:/root/.ollama
       - ./edge-node/entrypoint.sh:/entrypoint.sh
-    entrypoint: ["/entrypoint.sh"]
+    entrypoint: [ "/bin/bash", "/entrypoint.sh" ]
     ports:
       - "11435:11434"
+    networks:
+      - data-plane
+      - control-plane
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          cpus: "6.0"
+
+  # === NETWORK EMULATION ===
 
   toxiproxy:
-    image: ghcr.io/shopify/toxiproxy
-    container_name: toxiproxy
+    image: ghcr.io/shopify/toxiproxy:latest
     ports:
-      - "8474:8474"   # Toxiproxy API
-      - "8001:8001"   # Cloud proxy port
-      - "8002:8002"   # Edge proxy port
+      - "8474:8474"
+      - "8001:8001"
+      - "8002:8002"
+    networks:
+      - data-plane
+      - control-plane
+    restart: unless-stopped
+
+  toxiproxy-init:
+    build:
+      context: ./network
+    environment:
+      - TOXIPROXY_API=http://toxiproxy:8474
+    command: sh -c "sleep 3 && python init_proxies.py"
+    networks:
+      - data-plane
+      - control-plane
+    depends_on:
+      toxiproxy:
+        condition: service_started
+    restart: "no"
+
+  # === POLICY ENGINE ===
+
+  opa:
+    image: openpolicyagent/opa:latest
+    command: run --server --addr :8181 --log-level error /policies/routing.rego
+    volumes:
+      - ./safety/policies:/policies:ro
+    ports:
+      - "8181:8181"
+    networks:
+      - control-plane
+    restart: unless-stopped
+
+  # === ORCHESTRATOR (Tier-1 + Tier-2) ===
+
+  orchestrator:
+    build:
+      context: ./orchestrator
+    env_file: .env
+    environment:
+      - CLOUD_METRICS_URL=http://cloud-node:11434
+      - EDGE_METRICS_URL=http://edge-node:11434
+      - STRATEGIC_AGENT_URL=http://edge-node:11434
+      - TOXIPROXY_API=http://toxiproxy:8474
+      - OPA_URL=http://opa:8181/v1/data/routing
+    ports:
+      - "8080:8080"
+    networks:
+      - control-plane
+      - data-plane
+    depends_on:
+      toxiproxy-init:
+        condition: service_completed_successfully
+      opa:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-sf", "http://localhost:8080/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 512M
+
+  # === GATEWAY (Ingress) ===
+
+  gateway:
+    build:
+      context: ./gateway
+    env_file: .env
+    environment:
+      - BENCHMARK_STRATEGY=PROPOSED
+      - ORCHESTRATOR_URL=http://orchestrator:8080/route
+      - ORCHESTRATOR_METRICS_URL=http://orchestrator:8080/metrics/update
+      - CLOUD_INFERENCE_URL=http://toxiproxy:8001
+      - EDGE_INFERENCE_URL=http://toxiproxy:8002
+    ports:
+      - "8000:8000"
+    networks:
+      - data-plane
+      - control-plane
+    depends_on:
+      orchestrator:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-sf", "http://localhost:8000/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 256M
+
+  # === TELEMETRY ===
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./telemetry/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    ports:
+      - "9090:9090"
+    networks:
+      - control-plane
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:9090/-/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./telemetry/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    networks:
+      - control-plane
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  cloud-models:
+  edge-models:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  data-plane:
+    driver: bridge
+  control-plane:
+    driver: bridge

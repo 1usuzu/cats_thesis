@@ -1,0 +1,14 @@
+[
+  {
+    "name": "cloud-proxy",
+    "listen": "0.0.0.0:8001",
+    "upstream": "cloud-node:11434",
+    "enabled": true
+  },
+  {
+    "name": "edge-proxy",
+    "listen": "0.0.0.0:8002",
+    "upstream": "edge-node:11434",
+    "enabled": true
+  }
+]

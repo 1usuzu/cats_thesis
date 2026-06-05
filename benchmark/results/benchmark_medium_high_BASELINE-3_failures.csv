@@ -1,0 +1,3 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,/v1/chat,CatchResponseError('Failed with status code 500'),23,2026-06-05T08:09:57Z,2026-06-05T08:10:29Z
+POST,/v1/chat,CatchResponseError('Failed with status code 503'),2859,2026-06-05T08:09:58Z,2026-06-05T08:10:56Z

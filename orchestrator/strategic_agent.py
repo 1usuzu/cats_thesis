@@ -1,65 +1,97 @@
-import time
+"""Async strategic agent loop for LLM classification."""
+
+import asyncio
 import json
-import requests
-import threading
+import time
+
+import httpx
+import structlog
 from metrics_cache import metrics_cache
 from shared_state import shared_state
 from routing_templates import ROUTING_TEMPLATES
+from config import settings
 
-# Control Plane bypass Toxiproxy, trỏ thẳng vào mô hình Instruct trên Edge Node
-STRATEGIC_AGENT_URL = "http://localhost:11435/api/generate"
-MODEL_NAME = "qwen2.5:1.5b-instruct"
-EPOCH_S = 30  # Chu kỳ 30 giây
+logger = structlog.get_logger("strategic_agent")
 
-def get_telemetry_summary():
-    """Gom dữ liệu 30s thành JSON để cho LLM đọc"""
+
+def get_telemetry_summary() -> str:
     data = metrics_cache.get_all()
     summary = {
-        "latency_ms": {"cloud": data.get("cloud_latency_ms"), "edge": data.get("edge_latency_ms")},
-        "bandwidth_kbps": {"cloud": data.get("cloud_bandwidth_kbps"), "edge": data.get("edge_bandwidth_kbps")},
-        "queue_depth": {"cloud": data.get("cloud_queue_depth"), "edge": data.get("edge_queue_depth")},
-        "compute_util": {"cloud_gpu": data.get("cloud_gpu_util"), "edge_cpu": data.get("edge_cpu_util")},
-        "rps": {"current": data.get("current_rps"), "previous": data.get("previous_rps", 1.0)}
+        "latency_ms": {
+            "cloud": data.get("cloud_latency_ms"),
+            "edge": data.get("edge_latency_ms"),
+        },
+        "bandwidth_kbps": {
+            "cloud": data.get("cloud_bandwidth_kbps"),
+            "edge": data.get("edge_bandwidth_kbps"),
+        },
+        "gateway_inflight": {
+            "cloud": data.get("cloud_gateway_inflight"),
+            "edge": data.get("edge_gateway_inflight"),
+        },
+        "compute_util": {
+            "cloud_gpu": data.get("cloud_gpu_util"),
+            "edge_cpu": data.get("edge_cpu_util"),
+        },
+        "rps": {
+            "current": data.get("current_rps"),
+            "previous": data.get("previous_rps", 1.0),
+        },
     }
     return json.dumps(summary, indent=2)
 
-def rule_based_fallback(data):
-    """Rule-based Fallback nếu AI trả lời sai hoặc Timeout"""
-    edge_q = data.get("edge_queue_depth", 0)
-    edge_cpu = data.get("edge_cpu_util", 0)
-    c_lat, e_lat = data.get("cloud_latency_ms", 0), data.get("edge_latency_ms", 0)
-    c_bw, e_bw = data.get("cloud_bandwidth_kbps", 100000), data.get("edge_bandwidth_kbps", 100000)
-    curr_rps, prev_rps = data.get("current_rps", 0), max(1, data.get("previous_rps", 1))
 
-    cond_edge = edge_q > 35 or edge_cpu > 85
-    cond_deg = c_lat > 150 or e_lat > 150 or c_bw < 1000 or e_bw < 1000
-    cond_burst = curr_rps > 1.5 * prev_rps
-    
+def rule_based_fallback(data: dict) -> str:
+    edge_inflight = data.get("edge_gateway_inflight", 0)
+    edge_cpu = data.get("edge_cpu_util", 0)
+    c_lat = data.get("cloud_latency_ms", 0)
+    e_lat = data.get("edge_latency_ms", 0)
+    c_bw = data.get("cloud_bandwidth_kbps", 100000)
+    e_bw = data.get("edge_bandwidth_kbps", 100000)
+    curr_rps = data.get("current_rps", 0)
+    prev_rps = max(1, data.get("previous_rps", 1))
+
+    cond_edge = edge_inflight > settings.state_edge_loaded_inflight or edge_cpu > settings.state_edge_loaded_cpu
+    cond_deg = (
+        c_lat > settings.state_degraded_latency_ms
+        or e_lat > settings.state_degraded_latency_ms
+        or c_bw < settings.state_degraded_bandwidth_kbps
+        or e_bw < settings.state_degraded_bandwidth_kbps
+    )
+    cond_burst = curr_rps > settings.state_burst_ratio * prev_rps
+
     conditions_met = sum([cond_edge, cond_deg, cond_burst])
 
-    if conditions_met >= 2: return "STATE_CRITICAL"
-    if cond_edge: return "STATE_EDGE_LOADED"
-    if cond_deg: return "STATE_DEGRADED"
-    if cond_burst: return "STATE_BURST"
+    if conditions_met >= 2:
+        return "STATE_CRITICAL"
+    if cond_edge:
+        return "STATE_EDGE_LOADED"
+    if cond_deg:
+        return "STATE_DEGRADED"
+    if cond_burst:
+        return "STATE_BURST"
     return "STATE_NORMAL"
 
-def run_strategic_loop():
-    print("Strategic Agent (Tier-1) đã khởi động. Chu kỳ: 30s.")
-    while True:
-        # Chờ gom đủ data cho 1 Epoch
-        time.sleep(EPOCH_S)
-        
-        telemetry_json = get_telemetry_summary()
-        prompt = f"""You are a system state classifier for an LLM inference orchestrator.
+
+async def run_strategic_loop():
+    api_url = f"{settings.strategic_agent_url}/api/generate"
+    logger.info("Strategic Agent started", epoch_s=settings.strategic_epoch_s, model=settings.strategic_agent_model)
+
+    async with httpx.AsyncClient(timeout=settings.strategic_timeout_s) as client:
+        while True:
+            await asyncio.sleep(settings.strategic_epoch_s)
+
+            telemetry_json = get_telemetry_summary()
+            prompt = f"""You are a system state classifier for an LLM inference orchestrator.
 Read the telemetry summary and output EXACTLY ONE state label.
 
 Valid outputs (one word only):
 STATE_NORMAL | STATE_EDGE_LOADED | STATE_DEGRADED | STATE_BURST | STATE_CRITICAL
 
 Rules:
-- STATE_EDGE_LOADED: edge queue_depth > 35 OR edge cpu_util > 85
-- STATE_DEGRADED: any latency_ms > 150 OR any bandwidth_kbps < 1000
-- STATE_BURST: current_rps > 1.5 * previous_rps
+- STATE_EDGE_LOADED: edge gateway_inflight > {settings.state_edge_loaded_inflight} OR edge cpu_util > {settings.state_edge_loaded_cpu}
+- STATE_DEGRADED: any latency_ms > {settings.state_degraded_latency_ms} OR any bandwidth_kbps < {settings.state_degraded_bandwidth_kbps}
+- STATE_BURST: current_rps > {settings.state_burst_ratio} * previous_rps
 - STATE_CRITICAL: two or more of the above conditions apply
 - STATE_NORMAL: none of the above
 
@@ -68,40 +100,31 @@ Telemetry:
 
 Output the state label only."""
 
-        payload = {"model": MODEL_NAME, "prompt": prompt, "stream": False}
+            payload = {"model": settings.strategic_agent_model, "prompt": prompt, "stream": False}
 
-        try:
             start_time = time.time()
-            # Gọi LLM với Timeout 5s (Tránh treo hệ thống)
-            res = requests.post(STRATEGIC_AGENT_URL, json=payload, timeout=15.0)
-            res.raise_for_status()
-            output = res.json().get("response", "").strip().upper()
-            
-            valid_states = list(ROUTING_TEMPLATES.keys())
-            if output in valid_states:
-                final_state = output
-                print(f"[Tier-1] Qwen2.5-1.5B phân tích xong ({(time.time()-start_time):.2f}s): {final_state}")
-            else:
+            try:
+                res = await client.post(api_url, json=payload)
+                res.raise_for_status()
+                output = res.json().get("response", "").strip().upper()
+                elapsed = round(time.time() - start_time, 2)
+
+                valid_states = list(ROUTING_TEMPLATES.keys())
+                if output in valid_states:
+                    final_state = output
+                    logger.info("LLM classification successful", state=final_state, elapsed_s=elapsed)
+                else:
+                    final_state = rule_based_fallback(metrics_cache.get_all())
+                    logger.warning("LLM hallucination", output=output, fallback=final_state)
+
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
                 final_state = rule_based_fallback(metrics_cache.get_all())
-                print(f"[Tier-1] LLM xuất ảo giác ('{output}'). Fallback -> {final_state}")
+                logger.error("LLM request failed", error=str(e), fallback=final_state)
 
-        except Exception as e:
-            final_state = rule_based_fallback(metrics_cache.get_all())
-            print(f"[Tier-1] Lỗi gọi LLM ({e}). Kích hoạt Fallback -> {final_state}")
+            shared_state.update(final_state)
 
-        # Dán kết quả lên bảng chung cho Tier-2 dùng
-        shared_state.update(final_state)
 
 def start_strategic_agent():
-    threading.Thread(target=run_strategic_loop, daemon=True).start()
-
-# Hàm để chạy test độc lập
-if __name__ == "__main__":
-    # Để test nhanh, ta giảm Epoch xuống 5s thay vì 30s
-    EPOCH_S = 5 
-    # Bật dummy data reader để có số cho LLM đọc
-    from toxiproxy_reader import start_toxiproxy_reader
-    start_toxiproxy_reader()
-    
-    start_strategic_agent()
-    while True: time.sleep(1)
+    return asyncio.create_task(run_strategic_loop())
