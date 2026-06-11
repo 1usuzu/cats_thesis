@@ -93,6 +93,19 @@ async def prometheus_metrics():
     return metrics_cache.to_prometheus_format()
 
 
+@app.get("/telemetry")
+async def telemetry_json():
+    """Returns telemetry data as JSON for the UI dashboard."""
+    data = metrics_cache.get_all()
+    state, _ = shared_state.get()
+    
+    return {
+        "metrics": data,
+        "tier1_state": state
+    }
+
+
+
 @app.post("/metrics/update")
 async def update_gateway_metrics(metrics: GatewayMetrics):
     metrics_cache.update("cloud_gateway_inflight", metrics.cloud_inflight)

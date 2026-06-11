@@ -163,6 +163,7 @@ async def chat(req: ChatRequest):
     request_timestamps.append(time.time())
     decision = "cloud"
 
+    routing_analysis = None
     if settings.benchmark_strategy == "PROPOSED":
         try:
             res = await shared_http_client.client.post(
@@ -171,7 +172,9 @@ async def chat(req: ChatRequest):
                 timeout=settings.orchestrator_timeout_s,
             )
             res.raise_for_status()
-            decision = res.json().get("decision", "cloud")
+            route_data = res.json()
+            decision = route_data.get("decision", "cloud")
+            routing_analysis = route_data
         except Exception as e:
             logger.error("Orchestrator unavailable, falling back to cloud", error=str(e))
             decision = "cloud"
@@ -229,9 +232,15 @@ async def chat(req: ChatRequest):
         
         logger.info("Request routed successfully", site=decision, total_inference_ms=total_inference_ms)
         
+        meta_data = {"strategy": settings.benchmark_strategy}
+        if routing_analysis:
+            meta_data["routing_analysis"] = routing_analysis
+            
+        logger.info("Returning meta_data", meta_data=meta_data)
+        
         return APIResponse[ChatResponse](
             data=chat_resp,
-            meta={"strategy": settings.benchmark_strategy}
+            meta=meta_data
         )
         
     except Exception as e:

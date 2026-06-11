@@ -152,6 +152,8 @@ services:
       - ORCHESTRATOR_METRICS_URL=http://orchestrator:8080/metrics/update
       - CLOUD_INFERENCE_URL=http://toxiproxy:8001
       - EDGE_INFERENCE_URL=http://toxiproxy:8002
+      - CLOUD_METRICS_URL=http://cloud-node:11434
+      - EDGE_METRICS_URL=http://edge-node:11434
     ports:
       - "8000:8000"
     networks:
