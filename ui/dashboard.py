@@ -256,7 +256,7 @@ def add_telemetry_record(prompt, request_tag, gateway_response, duration_ms):
         "request_id": req_id,
         "timestamp": timestamp,
         "prompt": prompt,
-        "tag": request_tag,
+        "tag": analysis.get("computed_tag", request_tag) if analysis else request_tag,
         "strategy": meta.get("strategy", "UNKNOWN"),
         "cloud_score": final_scores.get("cloud", 0.0) if analysis else 0.0,
         "edge_score": final_scores.get("edge", 0.0) if analysis else 0.0,
@@ -265,7 +265,8 @@ def add_telemetry_record(prompt, request_tag, gateway_response, duration_ms):
         "opa_violations": opa_violations,
         "selected_route": route_info.get("site", "unknown").upper(),
         "selected_model": route_info.get("model", "unknown"),
-        "latency_ms": route_info.get("total_inference_ms", duration_ms)
+        "latency_ms": route_info.get("total_inference_ms", duration_ms),
+        "is_fallback": analysis.get("forced_fallback", False) if analysis else False
     }
     st.session_state.telemetry_records.append(record)
 
@@ -296,7 +297,7 @@ def page_overview():
     st.subheader(t("recent_reqs"))
     if st.session_state.telemetry_records:
         df = pd.DataFrame(st.session_state.telemetry_records)
-        cols = ["timestamp", "request_id", "prompt", "tag", "selected_route", "latency_ms"]
+        cols = ["timestamp", "request_id", "prompt", "tag", "selected_route", "is_fallback", "latency_ms"]
         df = df[[c for c in cols if c in df.columns]]
         st.dataframe(df, hide_index=True)
     else:
@@ -334,12 +335,15 @@ def page_route_explainability():
         st.markdown(f"<br/>**{t('telemetry_snap')}**", unsafe_allow_html=True)
         st.json({
             "Tier1_Network": rec['tier1_state'],
-            "Prompt_Complexity": "Moderate"
+            "Computed_Tag": rec['tag']
         })
 
     with right_col:
         st.markdown(f"**{t('decision_pipeline')}**")
         opa_color = "#10B981" if rec['opa_status'] == "enforced" and not rec['opa_violations'] else "#EF4444"
+        output_color = "#3B82F6" if not rec.get('is_fallback') else "#F59E0B"
+        output_bg = "rgba(59, 130, 246, 0.1)" if not rec.get('is_fallback') else "rgba(245, 158, 11, 0.1)"
+        fallback_text = "<br/><span style='color:#F59E0B; font-weight:bold;'>(FALLBACK)</span>" if rec.get('is_fallback') else ""
         flow_html = f"""
         <div class="pipeline-container">
             <div class="pipeline-step">
@@ -360,9 +364,9 @@ def page_route_explainability():
                 Violations: {len(rec['opa_violations'])}
             </div>
             <div class="pipeline-arrow">→</div>
-            <div class="pipeline-step" style="border-color: #3B82F6; background-color: rgba(59, 130, 246, 0.1);">
+            <div class="pipeline-step" style="border-color: {output_color}; background-color: {output_bg};">
                 <strong>4. {t('output')}</strong><br/>
-                Route: {rec['selected_route']}<br/>
+                Route: {rec['selected_route']}{fallback_text}<br/>
                 Latency: {rec['latency_ms']}ms
             </div>
         </div>

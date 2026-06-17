@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OPA Routing Input Schema",
+  "type": "object",
+  "required": ["input"],
+  "properties": {
+    "input": {
+      "type": "object",
+      "required": [
+        "site",
+        "gateway_inflight",
+        "compute_util",
+        "predicted_latency_ms",
+        "request_tag",
+        "site_state",
+        "sla_target_ms"
+      ],
+      "properties": {
+        "site": {
+          "type": "string",
+          "enum": ["cloud", "edge"],
+          "description": "The target inference site."
+        },
+        "gateway_inflight": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of concurrent requests the gateway has dispatched but not received a response for."
+        },
+        "compute_util": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Measured GPU utilization for Cloud, CPU utilization for Edge."
+        },
+        "predicted_latency_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Composite end-to-end latency estimate (network + inference + queue penalty)."
+        },
+        "request_tag": {
+          "type": "string",
+          "description": "Tag indicating request priority or quality requirement."
+        },
+        "site_state": {
+          "type": "string",
+          "enum": [
+            "STATE_NORMAL",
+            "STATE_EDGE_LOADED",
+            "STATE_DEGRADED",
+            "STATE_BURST",
+            "STATE_CRITICAL"
+          ],
+          "description": "Tier-1 system state classification."
+        },
+        "sla_target_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "SLA target in milliseconds."
+        }
+      }
+    }
+  }
+}

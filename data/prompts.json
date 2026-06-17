@@ -1,0 +1,2002 @@
+[
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 849)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 621)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 786)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 124)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 871)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 38)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 448)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 939)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 361)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 396)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 403)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 610)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 600)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 999)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 384)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 775)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 377)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 300)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 507)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 949)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 984)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 21)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 681)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 218)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 504)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 806)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 708)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 888)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 293)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 457)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 460)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 586)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 481)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 762)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 659)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 727)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 364)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 901)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 188)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 204)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 994)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 78)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 402)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 811)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 830)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 550)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 659)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 133)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 432)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 554)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 466)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 724)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 890)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 658)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 768)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 608)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 21)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 831)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 83)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 661)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 62)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 807)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 962)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 349)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 966)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 291)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 214)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 366)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 342)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 732)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 418)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 569)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 619)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 371)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 863)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 915)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 40)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 452)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 239)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 877)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 66)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 663)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 283)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 219)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 272)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 473)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 67)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 396)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 611)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 378)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 785)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 960)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 629)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 682)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 842)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 857)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 62)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 508)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 570)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 820)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 140)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 662)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 171)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 8)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 334)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 863)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 962)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 192)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 626)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 259)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 81)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 828)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 263)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 208)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 810)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 921)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 127)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 576)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 584)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 80)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 13)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 779)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 58)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 567)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 739)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 329)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 930)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 902)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 520)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 605)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 276)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 668)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 198)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 302)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 476)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 275)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 531)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 381)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 202)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 795)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 692)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 783)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 372)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 859)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 255)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 571)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 313)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 105)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 497)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 855)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 964)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 282)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 336)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 928)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 314)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 501)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 647)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 839)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 648)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 488)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 347)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 409)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 955)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 875)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 908)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 590)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 787)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 881)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 632)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 413)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 336)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 40)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 39)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 195)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 542)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 787)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 955)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 710)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 437)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 717)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 179)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 855)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 928)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 756)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 479)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 13)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 507)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 3)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 943)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 7)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 525)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 820)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 280)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 31)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 478)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 758)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 680)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 441)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 578)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 283)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 528)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 850)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 111)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 54)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 278)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 793)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 702)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 336)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 887)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 259)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 981)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 563)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 332)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 887)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 168)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 135)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 931)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 715)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 233)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 419)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 135)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 59)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 235)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 39)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 60)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 242)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 411)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 149)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 405)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 577)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 917)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 44)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 937)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 717)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 4)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 146)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 126)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 217)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 738)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 335)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 164)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 290)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 760)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 66)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 304)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 73)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 303)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 364)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 107)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 195)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 685)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 961)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 515)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 324)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 779)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 494)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 201)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 461)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 973)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 120)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 38)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 223)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 925)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 626)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 937)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 681)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 116)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 782)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 301)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 710)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 347)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 168)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 280)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 129)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 713)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 659)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 769)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 643)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 75)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 40)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 53)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 70)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 919)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 572)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 110)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 548)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 95)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 639)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 265)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 999)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 795)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 876)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 241)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 707)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 250)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 493)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 553)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 592)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 940)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 60)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 981)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 408)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 739)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 277)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 842)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 432)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 778)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 772)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 4)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 305)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 44)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 117)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 438)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 108)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 571)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 167)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 562)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 748)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 238)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 596)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 840)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 735)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 757)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 282)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 722)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 994)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 619)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 586)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 936)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 489)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 953)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 650)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 956)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 21)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 1000)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 835)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 800)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 635)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 52)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 86)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 38)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 865)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 82)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 58)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 956)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 798)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 442)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 873)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 570)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 493)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 372)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 627)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 556)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 811)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 41)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 366)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 88)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 128)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 88)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 346)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 960)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 773)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 413)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 75)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 728)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 20)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 681)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 463)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 935)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 132)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 937)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 620)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 3)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 998)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 92)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 672)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 53)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 248)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 943)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 468)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 159)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 776)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 911)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 2)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 208)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 213)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 343)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 411)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 116)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 444)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 731)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 561)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 779)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 587)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 806)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 643)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 787)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 22)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 935)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 205)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 213)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 343)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 263)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 738)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 10)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 783)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 546)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 900)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 76)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 409)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 877)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 846)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 369)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 115)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 186)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 650)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 955)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 950)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 504)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 324)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 25)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 624)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 566)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Explain how a combustion engine works. (Variation 681)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 764)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 879)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 860)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 840)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 885)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 731)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 944)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 154)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 727)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 845)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 222)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 841)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 462)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 123)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 648)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 496)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 54)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 145)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 123)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 534)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 762)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 387)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 808)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 636)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 716)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 302)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 709)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 597)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 20)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 64)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 978)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 927)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 210)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 524)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 12)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 268)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 249)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 622)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 801)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 617)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 622)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 864)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What is the capital of Australia? (Variation 894)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 453)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 403)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 749)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 491)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 129)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 717)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 69)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 845)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 650)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 616)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 813)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 990)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 75)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 655)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 135)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 37)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 209)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 658)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 176)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 756)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Summarize the plot of Hamlet. (Variation 857)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a poem about a rainy day. (Variation 636)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "What are the benefits of machine learning? (Variation 288)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 461)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 431)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Can you explain the theory of relativity? (Variation 579)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short essay on the history of Rome. (Variation 373)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 450)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 47)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Write a short story about a time traveler. (Variation 441)",
+    "request_tag": "fast_ok"
+  },
+  {
+    "prompt": "Translate 'Hello world' into French, Spanish, and German. (Variation 218)",
+    "request_tag": "default"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 54)",
+    "request_tag": "high_quality"
+  },
+  {
+    "prompt": "Give me 5 Python tips. (Variation 696)",
+    "request_tag": "high_quality"
+  }
+]

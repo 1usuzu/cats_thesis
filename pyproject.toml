@@ -37,3 +37,6 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "C90"]
 ignore = ["E501"]
+
+[tool.pyright]
+extraPaths = ["orchestrator", "gateway"]

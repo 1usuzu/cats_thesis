@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import asyncio
@@ -11,9 +12,13 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 # Import isolation logic
 from isolation import prepare_experiment_state
 
-PROFILES = ["good", "medium", "bad"]
-LOADS = ["low", "high"]
-STRATEGIES = ["PROPOSED", "BASELINE-1", "BASELINE-2", "BASELINE-3"]
+parser = argparse.ArgumentParser(description="CATS Benchmark Runner")
+parser.add_argument("--sanity", action="store_true", help="Run a quick sanity check (1 scenario) instead of full matrix")
+args = parser.parse_args()
+
+PROFILES = ["medium"] if args.sanity else ["good", "medium", "bad"]
+LOADS = ["low"] if args.sanity else ["low", "high"]
+STRATEGIES = ["PROPOSED"] if args.sanity else ["PROPOSED", "BASELINE-1", "BASELINE-2", "BASELINE-3"]
 
 # Ensure results directory exists
 RESULTS_DIR = Path(__file__).parent / "results"

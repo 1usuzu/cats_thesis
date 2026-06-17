@@ -30,7 +30,9 @@ class OrchestratorSettings(BaseSettings):
     max_gateway_inflight: int = 50
     max_gpu_util_pct: int = 90
     max_cpu_util_pct: int = 92
-    sla_target_ms: int = 500
+    sla_target_ms: int = 10000
+    sla_target_ms_fast: float = 5000.0
+    sla_target_ms_hq: float = 40000.0
 
     # Estimated ms penalty per in-flight request (for predicted_e2e_ms)
     queue_penalty_per_request_ms: int = 50
@@ -41,6 +43,12 @@ class OrchestratorSettings(BaseSettings):
     state_degraded_latency_ms: int = 150
     state_degraded_bandwidth_kbps: int = 1000
     state_burst_ratio: float = 1.5
+
+    # Phase 0: Routing Decision Hardening
+    fail_open_on_opa_unreachable: bool = False
+    emergency_override_enabled: bool = False
+    emergency_fallback_site: str = "cloud"
+    min_score_delta: float = 0.05
 
     # Timing
     strategic_epoch_s: int = 30

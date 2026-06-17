@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Routing OPA Input Schema",
+  "type": "object",
+  "properties": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "gateway_inflight": {
+          "type": "number",
+          "description": "Number of concurrent requests the gateway has dispatched to a site and not yet received a response for."
+        },
+        "compute_util": {
+          "type": "number",
+          "description": "Compute utilization percentage (GPU for cloud, CPU for edge)."
+        },
+        "predicted_latency_ms": {
+          "type": "number",
+          "description": "Composite E2E estimate: network + total inference time + queue penalty."
+        },
+        "sla_target_ms": {
+          "type": "number",
+          "description": "SLA latency target in milliseconds."
+        },
+        "site": {
+          "type": "string",
+          "enum": ["cloud", "edge"],
+          "description": "Target site to route to."
+        },
+        "request_tag": {
+          "type": "string",
+          "description": "Tag identifying the request's quality requirements."
+        },
+        "site_state": {
+          "type": "string",
+          "description": "Tier-1 classification state of the system."
+        }
+      },
+      "required": [
+        "gateway_inflight",
+        "compute_util",
+        "predicted_latency_ms",
+        "sla_target_ms",
+        "site",
+        "request_tag",
+        "site_state"
+      ]
+    }
+  },
+  "required": ["input"]
+}

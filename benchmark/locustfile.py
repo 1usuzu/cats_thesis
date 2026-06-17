@@ -38,6 +38,17 @@ class CATSUser(HttpUser):
                         exception=None,
                         context={},
                     )
+                    
+                    # Record fallback metrics explicitly
+                    if data.get("meta", {}).get("routing_analysis", {}).get("forced_fallback"):
+                        events.request.fire(
+                            request_type="ROUTE_FALLBACK",
+                            name=f"Forced Fallback to {route}",
+                            response_time=data["data"]["route"]["total_inference_ms"],
+                            response_length=len(response.text),
+                            exception=None,
+                            context={},
+                        )
                 response.success()
             else:
                 response.failure(f"Failed with status code {response.status_code}")

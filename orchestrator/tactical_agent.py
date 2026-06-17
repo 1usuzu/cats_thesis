@@ -48,13 +48,33 @@ def compute_cats_score(site: str, request_tag: str = "default") -> float:
 
     site_quality = settings.quality_cloud if site == "cloud" else settings.quality_edge
     
+    # Cost modifier integration
+    from shared_state import shared_state
+    cost_modifiers = shared_state.get_cost_modifiers()
+    site_cost_mod = cost_modifiers.get(site, 1.0)
+    
+    dynamic_weights = shared_state.get_dynamic_weights()
+    w_latency = dynamic_weights.get("w_latency", settings.w_latency)
+    w_queue = dynamic_weights.get("w_queue", settings.w_queue)
+    w_compute = dynamic_weights.get("w_compute", settings.w_compute)
+    
+    # Rescale weights (W_COST = 0.20, others scale down slightly)
+    w_lat_adj = w_latency * 0.8
+    w_queue_adj = w_queue * 0.8
+    w_comp_adj = w_compute * 0.8
+    w_qual_adj = w_quality * 0.8
+    
+    # Dynamic Cost Weight: Don't care much about cost if the task is complex
+    w_cost = 0.05 if request_tag == "high_quality" else 0.20
+    
     total_score = (
-        settings.w_latency * score_lat
-        + settings.w_queue * score_q
-        + settings.w_compute * score_comp
-        + w_quality * site_quality
+        w_lat_adj * score_lat
+        + w_queue_adj * score_q
+        + w_comp_adj * score_comp
+        + w_qual_adj * site_quality
+        + w_cost * site_cost_mod
     )
-    return round(total_score, 4)
+    return round(total_score, 4), site_cost_mod
 
 
 async def check_opa_safety(
@@ -80,6 +100,12 @@ async def check_opa_safety(
     queue_penalty_ms = gateway_inflight * settings.queue_penalty_per_request_ms
     predicted_e2e_ms = network_latency_ms + total_inference_ms_avg + queue_penalty_ms
 
+    dynamic_sla_ms = settings.sla_target_ms
+    if request_tag == "high_quality":
+        dynamic_sla_ms = getattr(settings, "sla_target_ms_hq", 40000.0)
+    elif request_tag == "fast_ok":
+        dynamic_sla_ms = getattr(settings, "sla_target_ms_fast", 5000.0)
+
     opa_input = {
         "input": {
             "site": site,
@@ -88,7 +114,7 @@ async def check_opa_safety(
             "predicted_latency_ms": predicted_e2e_ms,
             "request_tag": request_tag,
             "site_state": site_state,
-            "sla_target_ms": settings.sla_target_ms,
+            "sla_target_ms": dynamic_sla_ms,
         }
     }
 
@@ -107,10 +133,19 @@ async def check_opa_safety(
     except Exception as e:
         opa_latency_ms = round((_time.perf_counter() - t0) * 1000, 2)
         metrics_cache.update("opa_latency_ms", opa_latency_ms)
-        logger.error(
-            "OPA connection error, BYPASSING safety gate",
-            error=str(e),
-            site=site,
-            opa_latency_ms=opa_latency_ms,
-        )
-        return True, [], "bypassed"
+        if settings.fail_open_on_opa_unreachable:
+            logger.error(
+                "OPA connection error, BYPASSING safety gate",
+                error=str(e),
+                site=site,
+                opa_latency_ms=opa_latency_ms,
+            )
+            return True, ["OPA_UNREACHABLE_BYPASS"], "bypassed"
+        else:
+            logger.error(
+                "OPA connection error, BLOCKING request (fail-open disabled)",
+                error=str(e),
+                site=site,
+                opa_latency_ms=opa_latency_ms,
+            )
+            return False, ["OPA_UNREACHABLE"], "unreachable"

@@ -3,6 +3,14 @@ import time
 
 
 class MetricsCache:
+    """Thread-safe telemetry cache for the orchestrator.
+    
+    Telemetry semantics (Phase 0):
+    - latency_ms: Declared one-way network latency from Toxiproxy, not measured RTT.
+    - gateway_inflight: Number of concurrent requests the gateway has dispatched but not received a response for. NOT the internal Ollama queue depth.
+    - compute_util: Measured GPU utilization for Cloud, CPU utilization for Edge.
+    - total_inference_ms: Gateway-measured wall-clock time from POST to response.
+    """
     def __init__(self):
         self._cache = {}
         self._lock = threading.RLock()
@@ -23,6 +31,10 @@ class MetricsCache:
             "previous_rps": 0.0,
             "cloud_total_inference_ms_avg": 0.0,
             "edge_total_inference_ms_avg": 0.0,
+            "cloud_success_count": 0,
+            "cloud_failure_count": 0,
+            "edge_success_count": 0,
+            "edge_failure_count": 0,
         }
         for k, v in defaults.items():
             self.update(k, v)

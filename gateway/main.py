@@ -112,6 +112,18 @@ async def _push_metrics(cloud_total_inference: float = 0.0, edge_total_inference
     except Exception as e:
         logger.warning("Failed to push metrics to orchestrator", error=str(e))
 
+async def _push_result(site: str, success: bool):
+    """Push success/failure result to Orchestrator for Cost Agent retry_probability."""
+    try:
+        if shared_http_client.client:
+            base_url = settings.orchestrator_url.rsplit('/', 1)[0]
+            await shared_http_client.client.post(
+                f"{base_url}/metrics/update_result",
+                json={"site": site, "success": success},
+                timeout=1.0
+            )
+    except Exception as e:
+        logger.warning("Failed to push result to orchestrator", error=str(e))
 
 @app.get("/health", response_model=HealthResponse)
 async def health():
@@ -166,14 +178,22 @@ async def chat(req: ChatRequest):
     routing_analysis = None
     if settings.benchmark_strategy == "PROPOSED":
         try:
+            cb_states = circuit_breakers.get_states()
             res = await shared_http_client.client.post(
                 settings.orchestrator_url,
-                json={"prompt": req.prompt, "request_tag": req.request_tag},
+                json={"prompt": req.prompt, "request_tag": req.request_tag, "cb_states": cb_states},
                 timeout=settings.orchestrator_timeout_s,
             )
             res.raise_for_status()
             route_data = res.json()
             decision = route_data.get("decision", "cloud")
+            
+            if decision == "none":
+                return JSONResponse(
+                    status_code=503,
+                    content=APIResponse(error="Both inference sites are currently unavailable or rejected").model_dump()
+                )
+            
             routing_analysis = route_data
         except Exception as e:
             logger.error("Orchestrator unavailable, falling back to cloud", error=str(e))
@@ -187,15 +207,16 @@ async def chat(req: ChatRequest):
 
     # Circuit Breaker check
     cb = circuit_breakers.get(decision)
-    if not cb.can_execute():
-        logger.warning(f"Circuit for {decision} is OPEN. Failing over.")
-        decision = "edge" if decision == "cloud" else "cloud"
-        cb = circuit_breakers.get(decision)
+    if settings.benchmark_strategy != "PROPOSED":
         if not cb.can_execute():
-            return JSONResponse(
-                status_code=503,
-                content=APIResponse(error="Both inference sites are currently unavailable").model_dump()
-            )
+            logger.warning(f"Circuit for {decision} is OPEN. Failing over.")
+            decision = "edge" if decision == "cloud" else "cloud"
+            cb = circuit_breakers.get(decision)
+            if not cb.can_execute():
+                return JSONResponse(
+                    status_code=503,
+                    content=APIResponse(error="Both inference sites are currently unavailable").model_dump()
+                )
 
     target_url = _build_inference_url(decision)
     model_name = _get_model(decision)
@@ -211,8 +232,9 @@ async def chat(req: ChatRequest):
         response = await shared_http_client.client.post(target_url, json=payload)
         response.raise_for_status()
         
-        # Record success for circuit breaker
+        # Record success for circuit breaker and orchestrator
         cb.record_success()
+        asyncio.create_task(_push_result(decision, True))
         
         total_inference_ms = round((time.time() - start_time) * 1000)
 
@@ -244,8 +266,9 @@ async def chat(req: ChatRequest):
         )
         
     except Exception as e:
-        # Record failure for circuit breaker
+        # Record failure for circuit breaker and orchestrator
         cb.record_failure()
+        asyncio.create_task(_push_result(decision, False))
         logger.error("Inference failed", site=decision, error=str(e))
         return JSONResponse(
             status_code=500,
