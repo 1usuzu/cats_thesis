@@ -1,4 +1,3 @@
-import re
 import structlog
 
 logger = structlog.get_logger("classifier")
@@ -32,28 +31,28 @@ def classify_prompt_complexity(prompt: str) -> str:
     """
     if not prompt:
         return "fast_ok"
-        
+
     prompt_lower = prompt.lower()
     prompt_length = len(prompt_lower)
-    
+
     # 1. Very short prompts are usually simple greetings or basic questions
     if prompt_length < 25:
         # Check if even a short prompt has a complex keyword (e.g. "viết code python")
         if any(kw in prompt_lower for kw in ["code", "toán", "thơ", "lập trình"]):
             return "high_quality"
         return "fast_ok"
-        
+
     # 2. Keyword matching for high complexity
     # We use simple substring matching which is highly optimized in Python's C core
     for kw in COMPLEX_KEYWORDS:
         if kw in prompt_lower:
             logger.debug("Prompt classified as high_quality due to keyword", keyword=kw)
             return "high_quality"
-            
+
     # 3. Long prompts naturally require larger context windows and better attention mechanisms
     if prompt_length > 250:
         logger.debug("Prompt classified as high_quality due to length", length=prompt_length)
         return "high_quality"
-        
+
     # Default fallback for medium length prompts without complex keywords
     return "default"

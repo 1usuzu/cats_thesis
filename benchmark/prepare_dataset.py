@@ -1,6 +1,6 @@
 import json
-import random
 import os
+import random
 
 PROMPTS = [
     "Explain the concept of quantum computing in simple terms.",
@@ -36,12 +36,12 @@ def generate_dataset(num_samples: int = 1000):
             tag = "fast_ok"
         else:
             tag = "high_quality"
-            
+
         dataset.append({
             "prompt": random.choice(PROMPTS),
             "request_tag": tag
         })
-        
+
     os.makedirs("data", exist_ok=True)
     with open("data/prompts.json", "w") as f:
         json.dump(dataset, f, indent=2)

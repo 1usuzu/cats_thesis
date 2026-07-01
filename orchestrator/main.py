@@ -1,23 +1,32 @@
-import time
 import asyncio
+import time
 from contextlib import asynccontextmanager
 
+import httpx
 import structlog
 import uvicorn
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
-
-from metrics_cache import metrics_cache
-from toxiproxy_reader import start_toxiproxy_reader
-from compute_reader import start_compute_reader
-from strategic_agent import start_strategic_agent
-from tactical_agent import compute_cats_score, check_opa_safety, init_opa_client, close_opa_client
-from shared_state import shared_state
-from cost_agent import run_cost_loop
-from tuning_agent import start_tuning_agent
-from config import settings
 from classifier import classify_prompt_complexity
+from compute_reader import start_compute_reader
+from config import settings
+from cost_agent import run_cost_loop
+from critic_agent import critic_agent_loop
+from event_bus import event_bus
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
+from metrics_cache import metrics_cache
+from monitoring_agent import start_monitoring_agent
+from policy_agent import (
+    handle_anomaly,
+    handle_predictive_alert,
+    policy_agent_loop,
+    trigger_policy_proposal_manually,
+)
+from pydantic import BaseModel
+from shared_state import shared_state
+from strategic_agent import start_strategic_agent
+from tactical_agent import check_opa_safety, close_opa_client, compute_cats_score, init_opa_client
+from toxiproxy_reader import start_toxiproxy_reader
+from tuning_agent import start_tuning_agent
 
 # Configure structlog
 structlog.configure(
@@ -32,28 +41,59 @@ logger = structlog.get_logger("orchestrator")
 
 background_tasks = []
 
+# Cooldown state: prevents rapid route flipping between requests
+_last_decision: str | None = None
+_last_decision_change_time: float = 0.0
+_requests_since_change: int = 0
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize shared OPA client
     init_opa_client()
 
-    # Start readers
+    # Push initial policy to OPA via REST API
+    try:
+        opa_policy_url = settings.opa_url.replace("/v1/data/routing", "/v1/policies/routing")
+        with open("/safety/policies/routing.rego", "r") as f:
+            initial_policy = f.read()
+        async with httpx.AsyncClient() as client:
+            resp = await client.put(opa_policy_url, content=initial_policy, headers={"Content-Type": "text/plain"})
+            if resp.status_code == 200:
+                logger.info("Successfully pushed initial routing policy to OPA.")
+            else:
+                logger.error(f"Failed to push initial policy to OPA: {resp.text}")
+    except Exception as e:
+        logger.error(f"Error pushing initial policy to OPA: {e}")
+
+    # Start Event Bus (Phase 5 & 6)
+    event_bus.start()
+    event_bus.subscribe("anomaly", handle_anomaly)
+    event_bus.subscribe("predictive_alert", handle_predictive_alert)
+
+    # Start readers and agents
     task_tox = start_toxiproxy_reader()
     tasks_comp = start_compute_reader()
     task_strat = start_strategic_agent()
     task_cost = asyncio.create_task(run_cost_loop())
     task_tune = start_tuning_agent()
-    
+    task_policy = asyncio.create_task(policy_agent_loop())
+    task_critic = asyncio.create_task(critic_agent_loop())
+    task_monitoring = start_monitoring_agent()
+
     background_tasks.append(task_tox)
     background_tasks.extend(tasks_comp)
     background_tasks.append(task_strat)
     background_tasks.append(task_cost)
     background_tasks.append(task_tune)
-    
-    logger.info("Orchestrator background readers started")
+    background_tasks.append(task_policy)
+    background_tasks.append(task_critic)
+    background_tasks.append(task_monitoring)
+
+    logger.info("Orchestrator background readers and agents started")
     yield
-    
+
     logger.info("Orchestrator shutting down, cancelling tasks")
+    await event_bus.stop()
     for t in background_tasks:
         t.cancel()
     await close_opa_client()
@@ -83,6 +123,7 @@ class GatewayMetrics(BaseModel):
 class GatewayResult(BaseModel):
     site: str
     success: bool
+    sla_miss: bool = False
 
 @app.get("/health")
 async def health():
@@ -111,13 +152,72 @@ async def telemetry_json():
     """Returns telemetry data as JSON for the UI dashboard."""
     data = metrics_cache.get_all()
     state, _ = shared_state.get()
-    
+
     return {
         "metrics": data,
-        "tier1_state": state
+        "tier1_state": state,
+        "tuning": {
+            "dynamic_weights": shared_state.get_dynamic_weights(),
+            "sandbox_weights": shared_state.get_sandbox_weights(),
+            "canary_active": shared_state.is_canary_active()
+        },
+        "policy": shared_state.get_policy_proposal()
     }
 
+# --- POLICY SANDBOX APIs ---
+@app.get("/policy/status")
+async def get_policy_status():
+    """Returns current active policy, proposed policy, and validation status."""
+    try:
+        with open("/safety/policies/routing.rego", "r") as f:
+            active_policy = f.read()
+    except Exception:
+        active_policy = ""
 
+    return {
+        "active_policy": active_policy,
+        "proposal": shared_state.get_policy_proposal()
+    }
+
+@app.post("/policy/trigger")
+async def trigger_policy():
+    """Manually triggers the Policy Agent to propose a new policy."""
+    success = trigger_policy_proposal_manually()
+    if success:
+        return {"status": "triggered"}
+    return {"status": "failed"}
+
+@app.post("/policy/approve")
+async def approve_policy():
+    """Approves and deploys the proposed policy via OPA REST API."""
+    prop_state = shared_state.get_policy_proposal()
+    if not prop_state["has_proposal"] or prop_state["validation_results"].get("status") != "PASSED":
+        return {"status": "error", "message": "No valid proposal to approve"}
+
+    proposed_rego = prop_state["proposed_policy"]
+
+    try:
+        # 1. Update the OPA server directly via REST API (Hot Reload)
+        opa_url = settings.opa_url.replace("/v1/data/routing", "/v1/policies/routing")
+        async with httpx.AsyncClient() as client:
+            resp = await client.put(opa_url, content=proposed_rego, headers={"Content-Type": "text/plain"})
+            if resp.status_code != 200:
+                return {"status": "error", "message": f"OPA API rejected policy: {resp.text}"}
+
+        # 2. Write to disk for persistence across restarts
+        with open("/safety/policies/routing.rego", "w") as f:
+            f.write(proposed_rego)
+
+        shared_state.clear_policy_proposal()
+        return {"status": "success", "message": "Policy approved and deployed."}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/policy/reject")
+async def reject_policy():
+    """Rejects the proposed policy."""
+    shared_state.clear_policy_proposal()
+    return {"status": "success", "message": "Policy rejected."}
 
 @app.post("/metrics/update")
 async def update_gateway_metrics(metrics: GatewayMetrics):
@@ -138,17 +238,24 @@ async def update_gateway_result(res: GatewayResult):
             metrics_cache.update("cloud_success_count", data.get("cloud_success_count", 0) + 1)
         else:
             metrics_cache.update("cloud_failure_count", data.get("cloud_failure_count", 0) + 1)
+
+        if res.sla_miss:
+            metrics_cache.update("cloud_sla_miss_count", data.get("cloud_sla_miss_count", 0) + 1)
     else:
         if res.success:
             metrics_cache.update("edge_success_count", data.get("edge_success_count", 0) + 1)
         else:
             metrics_cache.update("edge_failure_count", data.get("edge_failure_count", 0) + 1)
+
+        if res.sla_miss:
+            metrics_cache.update("edge_sla_miss_count", data.get("edge_sla_miss_count", 0) + 1)
     return {"status": "ok"}
 
 
 @app.post("/route")
 async def get_routing_decision(req: RouteRequest):
     start_time = time.perf_counter()
+    import random
 
     current_state, current_template = shared_state.get()
 
@@ -156,8 +263,14 @@ async def get_routing_decision(req: RouteRequest):
     if computed_tag == "default" or not computed_tag:
         computed_tag = classify_prompt_complexity(req.prompt)
 
-    cloud_cats, cloud_cost_mod = compute_cats_score("cloud", computed_tag)
-    edge_cats, edge_cost_mod = compute_cats_score("edge", computed_tag)
+    # Canary logic: 10% traffic if active
+    is_canary = False
+    if shared_state.is_canary_active():
+        if random.random() < 0.10:
+            is_canary = True
+
+    cloud_cats, cloud_cost_mod = compute_cats_score("cloud", computed_tag, is_canary)
+    edge_cats, edge_cost_mod = compute_cats_score("edge", computed_tag, is_canary)
 
     cloud_final = cloud_cats * current_template.get("cloud", 0.5)
     edge_final = edge_cats * current_template.get("edge", 0.5)
@@ -178,6 +291,7 @@ async def get_routing_decision(req: RouteRequest):
             "decision_time_ms": decision_time_ms,
             "computed_tag": computed_tag,
             "forced_fallback": False,
+            "is_canary": is_canary,
         }
 
     if cloud_open:
@@ -192,6 +306,23 @@ async def get_routing_decision(req: RouteRequest):
         else:
             preferred_site = "cloud" if cloud_final >= edge_final else "edge"
         backup_site = "edge" if preferred_site == "cloud" else "cloud"
+
+        # Cooldown: if we recently changed route, stick with the old one
+        global _last_decision, _last_decision_change_time, _requests_since_change
+        if _last_decision is not None and preferred_site != _last_decision:
+            time_since_change = time.time() - _last_decision_change_time
+            within_cooldown = (
+                _requests_since_change < settings.cooldown_requests
+                or time_since_change < settings.cooldown_seconds
+            )
+            if within_cooldown:
+                # Hold the previous route (cooldown active)
+                preferred_site = _last_decision
+                backup_site = "edge" if preferred_site == "cloud" else "cloud"
+                logger.debug("Cooldown active, holding route",
+                             held_site=preferred_site,
+                             requests_since=_requests_since_change,
+                             seconds_since=round(time_since_change, 1))
 
     allow, violations, opa_status = await check_opa_safety(
         preferred_site, computed_tag, current_state
@@ -224,9 +355,19 @@ async def get_routing_decision(req: RouteRequest):
             logger.warning("Available site rejected by OPA and backup is OPEN. Applying Best-Effort Fallback", site=decision)
 
     decision_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
-    
+
+    # Update cooldown tracking
+    if not cloud_open and not edge_open:
+        if _last_decision is not None and decision != _last_decision:
+            _last_decision_change_time = time.time()
+            _requests_since_change = 0
+            logger.info("Route changed", old=_last_decision, new=decision)
+        else:
+            _requests_since_change += 1
+        _last_decision = decision
+
     data = metrics_cache.get_all()
-    
+
     explanation = {
         "summary": f"Routed to {decision.upper()}." + (" (FORCED FALLBACK)" if "FORCED_FALLBACK" in all_violations else ""),
         "primary_reason": "Score preference" if allow else ("Fallback passed OPA" if "FORCED_FALLBACK" not in all_violations else "Best-Effort Fallback"),
@@ -237,6 +378,8 @@ async def get_routing_decision(req: RouteRequest):
         "score_breakdown": {
             "cloud_cats": cloud_cats,
             "edge_cats": edge_cats,
+            "cloud_expected_cost": data.get("cloud_expected_cost", 0.0),
+            "edge_expected_cost": data.get("edge_expected_cost", 0.0),
             "cloud_cost_modifier": cloud_cost_mod,
             "edge_cost_modifier": edge_cost_mod,
             "cloud_final": round(cloud_final, 4),
@@ -255,9 +398,9 @@ async def get_routing_decision(req: RouteRequest):
         ]
     }
 
-    logger.info("Routing decision made", 
-                decision=decision, 
-                tier1_state=current_state, 
+    logger.info("Routing decision made",
+                decision=decision,
+                tier1_state=current_state,
                 opa_status=opa_status,
                 latency_ms=decision_time_ms)
 
@@ -272,6 +415,7 @@ async def get_routing_decision(req: RouteRequest):
         "decision_time_ms": decision_time_ms,
         "computed_tag": computed_tag,
         "forced_fallback": forced_fallback,
+        "is_canary": is_canary,
     }
 
 

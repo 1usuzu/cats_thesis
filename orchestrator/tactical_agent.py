@@ -1,11 +1,37 @@
+import json
 import time as _time
+from pathlib import Path
 
 import httpx
 import structlog
-from metrics_cache import metrics_cache
 from config import settings
+from metrics_cache import metrics_cache
+
+try:
+    import jsonschema
+    _schema_path = Path(__file__).parent.parent / "safety" / "schemas" / "opa_input_schema.json"
+    if _schema_path.exists():
+        with open(_schema_path) as f:
+            _OPA_INPUT_SCHEMA = json.load(f)
+    else:
+        _OPA_INPUT_SCHEMA = None
+except ImportError:
+    _OPA_INPUT_SCHEMA = None
 
 logger = structlog.get_logger("tactical_agent")
+
+# EMA state for score smoothing (Phase 0: Route Decision Stability)
+_ema_state: dict[str, float] = {}
+
+
+def _apply_ema(key: str, raw_value: float, alpha: float) -> float:
+    """Apply Exponential Moving Average to dampen metric noise."""
+    if key not in _ema_state:
+        _ema_state[key] = raw_value
+        return raw_value
+    smoothed = alpha * raw_value + (1 - alpha) * _ema_state[key]
+    _ema_state[key] = smoothed
+    return smoothed
 
 # Shared OPA client — initialized in orchestrator lifespan, avoids per-call TCP overhead
 _opa_client: httpx.AsyncClient | None = None
@@ -25,16 +51,21 @@ async def close_opa_client() -> None:
         _opa_client = None
 
 
-def compute_cats_score(site: str, request_tag: str = "default") -> float:
+def compute_cats_score(site: str, request_tag: str = "default", is_canary: bool = False) -> float:
     data = metrics_cache.get_all()
 
-    latency_ms = data.get(f"{site}_latency_ms", 0)
-    gateway_inflight = data.get(f"{site}_gateway_inflight", 0)
+    raw_latency = data.get(f"{site}_latency_ms", 0)
+    raw_inflight = data.get(f"{site}_gateway_inflight", 0)
 
     if site == "cloud":
-        compute_util = data.get("cloud_gpu_util", 0)
+        raw_compute = data.get("cloud_gpu_util", 0)
     else:
-        compute_util = data.get("edge_cpu_util", 0)
+        raw_compute = data.get("edge_cpu_util", 0)
+
+    # Apply EMA smoothing to dampen noise
+    latency_ms = _apply_ema(f"{site}_latency", raw_latency, settings.ema_alpha)
+    gateway_inflight = _apply_ema(f"{site}_inflight", raw_inflight, settings.ema_alpha)
+    compute_util = _apply_ema(f"{site}_compute", raw_compute, settings.ema_alpha)
 
     w_quality = settings.w_quality
     if request_tag == "fast_ok":
@@ -47,26 +78,30 @@ def compute_cats_score(site: str, request_tag: str = "default") -> float:
     score_comp = max(0.0, 1.0 - (compute_util / 100.0))
 
     site_quality = settings.quality_cloud if site == "cloud" else settings.quality_edge
-    
+
     # Cost modifier integration
     from shared_state import shared_state
     cost_modifiers = shared_state.get_cost_modifiers()
     site_cost_mod = cost_modifiers.get(site, 1.0)
-    
-    dynamic_weights = shared_state.get_dynamic_weights()
-    w_latency = dynamic_weights.get("w_latency", settings.w_latency)
-    w_queue = dynamic_weights.get("w_queue", settings.w_queue)
-    w_compute = dynamic_weights.get("w_compute", settings.w_compute)
-    
+
+    if is_canary:
+        weights = shared_state.get_sandbox_weights()
+    else:
+        weights = shared_state.get_dynamic_weights()
+
+    w_latency = weights.get("w_latency", settings.w_latency)
+    w_queue = weights.get("w_queue", settings.w_queue)
+    w_compute = weights.get("w_compute", settings.w_compute)
+
     # Rescale weights (W_COST = 0.20, others scale down slightly)
     w_lat_adj = w_latency * 0.8
     w_queue_adj = w_queue * 0.8
     w_comp_adj = w_compute * 0.8
     w_qual_adj = w_quality * 0.8
-    
+
     # Dynamic Cost Weight: Don't care much about cost if the task is complex
     w_cost = 0.05 if request_tag == "high_quality" else 0.20
-    
+
     total_score = (
         w_lat_adj * score_lat
         + w_queue_adj * score_q
@@ -119,6 +154,16 @@ async def check_opa_safety(
     }
 
     try:
+        # Validate OPA input schema if available
+        if _OPA_INPUT_SCHEMA is not None:
+            try:
+                jsonschema.validate(instance=opa_input["input"], schema=_OPA_INPUT_SCHEMA)
+            except jsonschema.ValidationError as ve:
+                logger.error("OPA input schema validation failed",
+                             error=str(ve.message),
+                             path=list(ve.absolute_path))
+                return False, ["SCHEMA_VALIDATION_FAILED"], "error"
+
         if not _opa_client:
             raise RuntimeError("OPA client not initialized")
         client = _opa_client

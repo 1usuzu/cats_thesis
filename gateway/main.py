@@ -7,20 +7,26 @@ from contextlib import asynccontextmanager
 import httpx
 import structlog
 import uvicorn
+from auth import api_key_auth_middleware
+from circuit_breaker import circuit_breakers
+from config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
-
-from config import settings
 from middleware import RequestIDMiddleware, TimingMiddleware
-from rate_limiter import rate_limit_middleware
-from auth import api_key_auth_middleware
-from circuit_breaker import circuit_breakers, CircuitState
-from models import APIResponse, ChatRequest, ChatResponse, ErrorResponse, HealthResponse, ReadinessResponse, RouteInfo
+from models import (
+    APIResponse,
+    ChatRequest,
+    ChatResponse,
+    HealthResponse,
+    ReadinessResponse,
+    RouteInfo,
+)
 from pydantic import BaseModel
 from quality_sample import router as quality_router
+from rate_limiter import rate_limit_middleware
 from shared_client import shared_http_client
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # Configure structlog
 structlog.configure(
@@ -112,14 +118,14 @@ async def _push_metrics(cloud_total_inference: float = 0.0, edge_total_inference
     except Exception as e:
         logger.warning("Failed to push metrics to orchestrator", error=str(e))
 
-async def _push_result(site: str, success: bool):
-    """Push success/failure result to Orchestrator for Cost Agent retry_probability."""
+async def _push_result(site: str, success: bool, sla_miss: bool = False):
+    """Push success/failure result and SLA misses to Orchestrator for Cost Agent."""
     try:
         if shared_http_client.client:
             base_url = settings.orchestrator_url.rsplit('/', 1)[0]
             await shared_http_client.client.post(
                 f"{base_url}/metrics/update_result",
-                json={"site": site, "success": success},
+                json={"site": site, "success": success, "sla_miss": sla_miss},
                 timeout=1.0
             )
     except Exception as e:
@@ -187,13 +193,13 @@ async def chat(req: ChatRequest):
             res.raise_for_status()
             route_data = res.json()
             decision = route_data.get("decision", "cloud")
-            
+
             if decision == "none":
                 return JSONResponse(
                     status_code=503,
                     content=APIResponse(error="Both inference sites are currently unavailable or rejected").model_dump()
                 )
-            
+
             routing_analysis = route_data
         except Exception as e:
             logger.error("Orchestrator unavailable, falling back to cloud", error=str(e))
@@ -231,12 +237,22 @@ async def chat(req: ChatRequest):
     try:
         response = await shared_http_client.client.post(target_url, json=payload)
         response.raise_for_status()
-        
+
+
+        total_inference_ms = round((time.time() - start_time) * 1000)
+
+        # Check SLA miss based on request tag
+        sla_target = settings.sla_target_ms
+        if req.request_tag == "fast_ok":
+            sla_target = settings.sla_target_ms_fast
+        elif req.request_tag == "high_quality":
+            sla_target = settings.sla_target_ms_hq
+
+        sla_miss = total_inference_ms > sla_target
+
         # Record success for circuit breaker and orchestrator
         cb.record_success()
-        asyncio.create_task(_push_result(decision, True))
-        
-        total_inference_ms = round((time.time() - start_time) * 1000)
+        asyncio.create_task(_push_result(decision, True, sla_miss))
 
         c_tot = total_inference_ms if decision == "cloud" else 0.0
         e_tot = total_inference_ms if decision == "edge" else 0.0
@@ -251,20 +267,20 @@ async def chat(req: ChatRequest):
                 total_inference_ms=total_inference_ms
             )
         )
-        
+
         logger.info("Request routed successfully", site=decision, total_inference_ms=total_inference_ms)
-        
+
         meta_data = {"strategy": settings.benchmark_strategy}
         if routing_analysis:
             meta_data["routing_analysis"] = routing_analysis
-            
+
         logger.info("Returning meta_data", meta_data=meta_data)
-        
+
         return APIResponse[ChatResponse](
             data=chat_resp,
             meta=meta_data
         )
-        
+
     except Exception as e:
         # Record failure for circuit breaker and orchestrator
         cb.record_failure()

@@ -1,17 +1,17 @@
 """Async reader for Toxiproxy metrics."""
 
 import asyncio
+
 import httpx
 import structlog
-
-from metrics_cache import metrics_cache
 from config import settings
+from metrics_cache import metrics_cache
 
 logger = structlog.get_logger("toxiproxy_reader")
 
 async def fetch_toxiproxy_metrics():
     proxies_url = f"{settings.toxiproxy_api}/proxies"
-    
+
     async with httpx.AsyncClient(timeout=2.0) as client:
         while True:
             try:
@@ -21,7 +21,7 @@ async def fetch_toxiproxy_metrics():
                         response = await client.get(f"{proxies_url}/{proxy_name}/toxics")
                         response.raise_for_status()
                         toxics = response.json()
-                        
+
                         latency_ms = 0
                         jitter_ms = 0
                         bandwidth_kbps = 100000

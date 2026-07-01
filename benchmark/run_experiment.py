@@ -1,13 +1,13 @@
-import httpx
-import time
-import subprocess
 import os
+import subprocess
+
+import httpx
 
 TOXIPROXY_URL = "http://localhost:8474"
 
 def configure_network(scenario: str):
     print(f"Configuring network for scenario: {scenario}")
-    
+
     # Reset all toxics
     with httpx.Client() as client:
         # Delete existing toxics
@@ -21,12 +21,12 @@ def configure_network(scenario: str):
 
         if scenario == "NORMAL":
             pass # No toxics
-            
+
         elif scenario == "EDGE_LOADED":
             # Just let Locust send burst to edge or simulate it via orchestrator config,
             # but Toxiproxy doesn't control CPU. We can simulate it by adding latency to edge
-            pass 
-            
+            pass
+
         elif scenario == "DEGRADED":
             # Add 200ms latency to both
             for proxy in ["cloud-proxy", "edge-proxy"]:
@@ -37,7 +37,7 @@ def configure_network(scenario: str):
                     "toxicity": 1.0,
                     "attributes": {"latency": 200, "jitter": 20}
                 })
-                
+
         elif scenario == "MULTI_FAIL":
             # Cloud drops 50% packets, Edge 500ms latency
             client.post(f"{TOXIPROXY_URL}/proxies/cloud-proxy/toxics", json={

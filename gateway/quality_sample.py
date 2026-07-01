@@ -7,10 +7,8 @@ collects both responses for paired quality comparison.
 import asyncio
 import time
 
-import httpx
-from fastapi import APIRouter
-
 from config import settings
+from fastapi import APIRouter
 from models import QualitySampleRequest, QualitySampleResponse
 from shared_client import shared_http_client
 

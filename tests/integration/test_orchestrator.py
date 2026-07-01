@@ -1,7 +1,8 @@
+
 import pytest
-from httpx import AsyncClient, ASGITransport
-import asyncio
+from httpx import ASGITransport, AsyncClient
 from main import app as orchestrator_app
+
 
 @pytest.mark.asyncio
 async def test_health_check():
@@ -23,7 +24,7 @@ async def test_metrics_update_and_export():
         }
         res_post = await ac.post("/metrics/update", json=payload)
         assert res_post.status_code == 200
-        
+
         # Get metrics
         res_get = await ac.get("/metrics")
         assert res_get.status_code == 200

@@ -1,6 +1,7 @@
 """Apply MEDIUM network profile via Toxiproxy REST API (Plan v5.0)."""
 
 import os
+
 import requests
 
 PROFILES = {

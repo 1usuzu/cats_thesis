@@ -2,6 +2,7 @@
 
 import time
 from enum import Enum
+
 import structlog
 
 logger = structlog.get_logger("circuit_breaker")
@@ -23,7 +24,7 @@ class CircuitBreaker:
     def can_execute(self) -> bool:
         if self.state == CircuitState.CLOSED:
             return True
-        
+
         if self.state == CircuitState.OPEN:
             now = time.time()
             if now - self.last_failure_time >= self.recovery_timeout:
@@ -31,10 +32,10 @@ class CircuitBreaker:
                 logger.info("Circuit breaker entering HALF_OPEN state")
                 return True
             return False
-            
+
         if self.state == CircuitState.HALF_OPEN:
             return True
-            
+
         return True
 
     def record_success(self):
@@ -48,11 +49,11 @@ class CircuitBreaker:
     def record_failure(self):
         self.failures += 1
         self.last_failure_time = time.time()
-        
+
         if self.state == CircuitState.CLOSED and self.failures >= self.failure_threshold:
             logger.warning("Circuit breaker tripped, entering OPEN state")
             self.state = CircuitState.OPEN
-            
+
         elif self.state == CircuitState.HALF_OPEN:
             logger.warning("Circuit breaker recovery failed, returning to OPEN state")
             self.state = CircuitState.OPEN
@@ -70,7 +71,7 @@ class CircuitBreakerRegistry:
 
     def get(self, site: str) -> CircuitBreaker:
         return self.breakers[site]
-        
+
     def get_states(self) -> dict:
         return {site: cb.get_state() for site, cb in self.breakers.items()}
 

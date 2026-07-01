@@ -96,7 +96,7 @@ services:
 
   opa:
     image: openpolicyagent/opa:latest
-    command: run --server --addr :8181 --log-level error /policies/routing.rego
+    command: run --server --addr :8181 --log-level error
     volumes:
       - ./safety/policies:/policies:ro
     ports:
@@ -117,6 +117,8 @@ services:
       - STRATEGIC_AGENT_URL=http://edge-node:11434
       - TOXIPROXY_API=http://toxiproxy:8474
       - OPA_URL=http://opa:8181/v1/data/routing
+    volumes:
+      - ./safety/policies:/safety/policies
     ports:
       - "8080:8080"
     networks:

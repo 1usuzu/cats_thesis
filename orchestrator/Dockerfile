@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install OPA CLI for Critic Agent validation
+RUN curl -L -o /usr/local/bin/opa https://openpolicyagent.org/downloads/v0.61.0/opa_linux_amd64_static && \
+    chmod +x /usr/local/bin/opa
+
 COPY . .
 
 EXPOSE 8080

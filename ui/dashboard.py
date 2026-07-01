@@ -1,10 +1,10 @@
-import streamlit as st
-import requests
-import json
 import os
 import time
 from datetime import datetime
+
 import pandas as pd
+import requests
+import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,7 +33,7 @@ TRANSLATIONS = {
         "nav_explain": "Route Explainability",
         "nav_console": "Interactive Console",
         "nav_telemetry": "Health & Telemetry",
-        
+
         "overview_desc": "Real-time system status and snapshot metrics.",
         "sys_status": "System Status",
         "edge_status": "Edge Status",
@@ -44,7 +44,7 @@ TRANSLATIONS = {
         "enforcing": "ENFORCING",
         "gw_healthy": "Gateway healthy",
         "recent_reqs": "Recent Requests",
-        
+
         "no_telemetry": "No routing telemetry available yet. Use the Interactive Console.",
         "inspect_req": "Inspect Request",
         "decision_summary": "Decision Summary",
@@ -61,13 +61,13 @@ TRANSLATIONS = {
         "alt_route": "Alternative Route",
         "reason_edge": "Latency SLA requirement met by Edge",
         "reason_cloud": "Complex task required Cloud capability",
-        
+
         "health_desc": "Granular runtime signals affecting routing decisions.",
         "gw_queue": "Gateway Queue",
         "edge_cpu": "Edge Node CPU",
         "net_latency": "Network Latency",
         "proxy_status": "Proxy Status",
-        
+
         "console_desc": "Send requests to the Gateway and see how they are routed.",
         "enter_prompt": "Enter your prompt...",
         "processing": "Processing via Gateway...",
@@ -75,6 +75,12 @@ TRANSLATIONS = {
         "api_err": "API Error",
         "conn_failed": "Connection failed.",
         "lang": "Language",
+        "nav_cost": "Cost Analysis",
+        "nav_tuning": "Parameter Tuning",
+        "nav_policy": "Policy Sandbox",
+        "cost_desc": "Cost breakdown and financial metrics for routing decisions.",
+        "cloud_exp_cost": "Cloud Expected Cost",
+        "edge_exp_cost": "Edge Expected Cost",
     },
     "VI": {
         "cats_control_plane": "Bảng Điều Khiển CATS",
@@ -86,7 +92,7 @@ TRANSLATIONS = {
         "nav_explain": "Giải Thích Định Tuyến",
         "nav_console": "Bảng Điều Khiển Tương Tác",
         "nav_telemetry": "Sức Khỏe Hệ Thống",
-        
+
         "overview_desc": "Trạng thái hệ thống thời gian thực và số liệu hiện tại.",
         "sys_status": "Trạng Thái Hệ Thống",
         "edge_status": "Trạng Thái Edge",
@@ -97,7 +103,7 @@ TRANSLATIONS = {
         "enforcing": "ĐANG ÁP DỤNG",
         "gw_healthy": "Gateway ổn định",
         "recent_reqs": "Các Yêu Cầu Gần Đây",
-        
+
         "no_telemetry": "Chưa có dữ liệu định tuyến. Vui lòng sử dụng Bảng Điều Khiển Tương Tác.",
         "inspect_req": "Kiểm Tra Yêu Cầu",
         "decision_summary": "Tóm Tắt Quyết Định",
@@ -114,13 +120,13 @@ TRANSLATIONS = {
         "alt_route": "Tuyến Dự Phòng",
         "reason_edge": "Edge đáp ứng đủ yêu cầu về độ trễ (SLA)",
         "reason_cloud": "Tác vụ phức tạp cần năng lực tính toán của Cloud",
-        
+
         "health_desc": "Các tín hiệu chi tiết tại thời gian chạy ảnh hưởng đến định tuyến.",
         "gw_queue": "Hàng Đợi Gateway",
         "edge_cpu": "CPU của Edge",
         "net_latency": "Độ Trễ Mạng (Latency)",
         "proxy_status": "Trạng Thái Proxy",
-        
+
         "console_desc": "Gửi yêu cầu tới Gateway và xem cách chúng được định tuyến.",
         "enter_prompt": "Nhập câu hỏi của bạn...",
         "processing": "Đang xử lý qua Gateway...",
@@ -128,6 +134,12 @@ TRANSLATIONS = {
         "api_err": "Lỗi API",
         "conn_failed": "Kết nối thất bại.",
         "lang": "Ngôn ngữ / Language",
+        "nav_cost": "Phân Tích Chi Phí",
+        "nav_tuning": "Tinh Chỉnh Tham Số",
+        "nav_policy": "Policy Sandbox",
+        "cost_desc": "Chi tiết phân bổ chi phí dựa trên xác suất Retry & SLA.",
+        "cloud_exp_cost": "Chi Phí Kỳ Vọng (Cloud)",
+        "edge_exp_cost": "Chi Phí Kỳ Vọng (Edge)",
     }
 }
 
@@ -142,29 +154,29 @@ def inject_css():
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
     html, body, p, label, h1, h2, h3, h4, h5, h6, .stMarkdown, .stText { font-family: 'Fira Sans', sans-serif !important; }
     code, pre, .mono-font, .metric-value, .timeline-time { font-family: 'Fira Code', monospace !important; }
-    
+
     /* Remove vertical scrolling by compressing margins/padding */
     .block-container {
         padding-top: 3.5rem !important;
         padding-bottom: 0rem !important;
         max-width: 95% !important;
     }
-    
+
     h1 {
         margin-bottom: 0.5rem !important;
         padding-bottom: 0 !important;
         font-size: 1.8rem !important;
     }
-    
+
     hr {
         margin-top: 0.5rem !important;
         margin-bottom: 1rem !important;
     }
-    
+
     .stSelectbox {
         margin-bottom: 0 !important;
     }
-    
+
     .metric-card {
         background-color: var(--card-bg);
         border: 1px solid var(--border-color);
@@ -172,7 +184,7 @@ def inject_css():
         border-radius: 0.5rem;
         text-align: left;
     }
-    
+
     /* Flowchart / Pipeline layout for Explainability */
     .pipeline-container {
         display: flex;
@@ -201,7 +213,7 @@ def inject_css():
         opacity: 0.5;
         align-self: center;
     }
-    
+
     /* JSON block compression */
     .stJson {
         font-size: 0.8rem;
@@ -245,13 +257,13 @@ def add_telemetry_record(prompt, request_tag, gateway_response, duration_ms):
     route_info = api_resp.get("route", {})
     meta = gateway_response.get("meta", {})
     analysis = meta.get("routing_analysis", {})
-    
+
     timestamp = datetime.now().strftime("%H:%M:%S")
     req_id = f"REQ-{len(st.session_state.telemetry_records) + 1:04d}"
-    
+
     final_scores = analysis.get("final_scores", {})
     opa_violations = analysis.get("opa_violations", [])
-    
+
     record = {
         "request_id": req_id,
         "timestamp": timestamp,
@@ -266,7 +278,9 @@ def add_telemetry_record(prompt, request_tag, gateway_response, duration_ms):
         "selected_route": route_info.get("site", "unknown").upper(),
         "selected_model": route_info.get("model", "unknown"),
         "latency_ms": route_info.get("total_inference_ms", duration_ms),
-        "is_fallback": analysis.get("forced_fallback", False) if analysis else False
+        "is_fallback": analysis.get("forced_fallback", False) if analysis else False,
+        "cloud_expected_cost": analysis.get("score_breakdown", {}).get("cloud_expected_cost", 0.0) if analysis else 0.0,
+        "edge_expected_cost": analysis.get("score_breakdown", {}).get("edge_expected_cost", 0.0) if analysis else 0.0
     }
     st.session_state.telemetry_records.append(record)
 
@@ -276,16 +290,16 @@ def page_overview():
     st.title(t("nav_overview"))
     st.markdown(t("overview_desc"))
     st.divider()
-    
+
     gw_health = fetch_gateway_health()
     tel = fetch_telemetry()
-    
+
     sys_status_val = t("operational") if gw_health else "OFFLINE"
     gw_msg = t("gw_healthy") if gw_health else "Unreachable"
-    
+
     edge_status_val = t("online") if gw_health and gw_health.get("checks", {}).get("edge_node") else "OFFLINE"
     cloud_status_val = t("online") if gw_health and gw_health.get("checks", {}).get("cloud_node") else "OFFLINE"
-    
+
     opa_status_val = t("enforcing") if tel else "UNKNOWN"
 
     c1, c2, c3, c4 = st.columns(4)
@@ -293,7 +307,7 @@ def page_overview():
     c2.metric(t("edge_status"), edge_status_val)
     c3.metric(t("cloud_status"), cloud_status_val)
     c4.metric(t("opa_safety"), opa_status_val)
-    
+
     st.subheader(t("recent_reqs"))
     if st.session_state.telemetry_records:
         df = pd.DataFrame(st.session_state.telemetry_records)
@@ -305,33 +319,33 @@ def page_overview():
 
 def page_route_explainability():
     st.markdown(f"<h1 style='font-size: 1.5rem;'>{t('nav_explain')}</h1>", unsafe_allow_html=True)
-    
+
     if not st.session_state.telemetry_records:
         st.info(t("no_telemetry"))
         return
-        
+
     records = {r["request_id"]: f"{r['request_id']} ({r['tag']}) - {r['timestamp']}" for r in reversed(st.session_state.telemetry_records)}
     selected_id = st.selectbox(t("inspect_req"), options=list(records.keys()), format_func=lambda x: records[x], label_visibility="collapsed")
-    
+
     rec = next((r for r in st.session_state.telemetry_records if r["request_id"] == selected_id), None)
     if not rec:
         return
-        
+
     left_col, right_col = st.columns([1, 2.5])
-    
+
     with left_col:
         st.markdown(f"**{t('decision_summary')}**")
         st.markdown(f"**Prompt:** *\"{rec['prompt']}\"*")
         st.markdown(f"**{t('sel_route')}:** `{rec['selected_route']}`<br/>**{t('model')}:** `{rec['selected_model']}`<br/>**{t('score_diff')}:** {abs(rec['cloud_score'] - rec['edge_score']):.3f}", unsafe_allow_html=True)
-        
+
         primary_reason = t("reason_edge") if rec['selected_route'] == "EDGE" else t("reason_cloud")
         st.markdown(f"**{t('primary_reason')}:** {primary_reason}")
-        
+
         st.markdown(f"<br/>**{t('alt_route')}**", unsafe_allow_html=True)
         alt_route = "CLOUD" if rec['selected_route'] == "EDGE" else "EDGE"
         alt_score = rec['cloud_score'] if alt_route == "CLOUD" else rec['edge_score']
         st.markdown(f"Fallback: **{alt_route}**<br/>Score: {alt_score:.3f}", unsafe_allow_html=True)
-        
+
         st.markdown(f"<br/>**{t('telemetry_snap')}**", unsafe_allow_html=True)
         st.json({
             "Tier1_Network": rec['tier1_state'],
@@ -377,20 +391,20 @@ def page_telemetry():
     st.title(t("nav_telemetry"))
     st.markdown(t("health_desc"))
     st.divider()
-    
+
     tel = fetch_telemetry()
     if tel:
         metrics = tel.get("metrics", {})
         cloud_q = metrics.get("cloud_gateway_inflight", 0)
         edge_q = metrics.get("edge_gateway_inflight", 0)
         total_q = cloud_q + edge_q
-        
+
         edge_cpu = metrics.get("edge_cpu_util", 0)
-        
+
         state = tel.get("tier1_state", {})
         proxy_val = "ACTIVE" if state else "UNKNOWN"
         latency = state.get("latency_ms", metrics.get("edge_latency_ms", 0)) if isinstance(state, dict) else metrics.get("edge_latency_ms", 0)
-        
+
         c1, c2, c3, c4 = st.columns(4)
         c1.metric(t("gw_queue"), f"{total_q} in-flight")
         c2.metric(t("edge_cpu"), f"{edge_cpu:.1f}%")
@@ -404,34 +418,168 @@ def page_telemetry():
         c3.metric(t("net_latency"), "N/A")
         c4.metric(t("proxy_status"), "N/A")
 
+def page_cost_analysis():
+    st.title(t("nav_cost"))
+    st.markdown(t("cost_desc"))
+    st.divider()
+
+    if not st.session_state.telemetry_records:
+        st.info(t("no_telemetry"))
+        return
+
+    records = {r["request_id"]: f"{r['request_id']} ({r['tag']}) - {r['timestamp']}" for r in reversed(st.session_state.telemetry_records)}
+    selected_id = st.selectbox(t("inspect_req"), options=list(records.keys()), format_func=lambda x: records[x], label_visibility="collapsed", key="cost_req_select")
+
+    rec = next((r for r in st.session_state.telemetry_records if r["request_id"] == selected_id), None)
+    if not rec:
+        return
+
+    c_cost = rec.get('cloud_expected_cost', 0.0)
+    e_cost = rec.get('edge_expected_cost', 0.0)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(t("cloud_exp_cost"), f"${c_cost:.5f}")
+    with col2:
+        st.metric(t("edge_exp_cost"), f"${e_cost:.5f}")
+
+    # Thêm bảng phân bổ lịch sử cost
+    st.subheader("Historical Cost Overview")
+    df = pd.DataFrame(st.session_state.telemetry_records)
+    cols = ["timestamp", "request_id", "tag", "selected_route", "cloud_expected_cost", "edge_expected_cost"]
+    df = df[[c for c in cols if c in df.columns]]
+    st.dataframe(df, hide_index=True)
+
+def page_tuning():
+    st.title(t("nav_tuning"))
+    st.markdown("Monitor Auto-Tuning heuristics and Canary validation in real-time.")
+    st.divider()
+
+    tel = fetch_telemetry()
+    if not tel:
+        st.warning(t("no_telemetry"))
+        return
+
+    tuning_info = tel.get("tuning", {})
+    canary_active = tuning_info.get("canary_active", False)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Production Weights (90%)")
+        prod = tuning_info.get("dynamic_weights", {})
+        st.metric("w_latency", f"{prod.get('w_latency', 0):.3f}")
+        st.metric("w_queue", f"{prod.get('w_queue', 0):.3f}")
+        st.metric("w_compute", f"{prod.get('w_compute', 0):.3f}")
+
+    with col2:
+        if canary_active:
+            st.subheader("Canary Weights (10%) - 🟢 ACTIVE")
+        else:
+            st.subheader("Sandbox Weights - ⚪ IDLE")
+        sandbox = tuning_info.get("sandbox_weights", {})
+        st.metric("w_latency", f"{sandbox.get('w_latency', 0):.3f}", f"{sandbox.get('w_latency', 0) - prod.get('w_latency', 0):.3f}")
+        st.metric("w_queue", f"{sandbox.get('w_queue', 0):.3f}", f"{sandbox.get('w_queue', 0) - prod.get('w_queue', 0):.3f}")
+        st.metric("w_compute", f"{sandbox.get('w_compute', 0):.3f}", f"{sandbox.get('w_compute', 0) - prod.get('w_compute', 0):.3f}")
+
+    st.divider()
+    st.markdown("**LLM Strategic Assistance**: Enabled (Triggered via `tuning_agent.py`)")
+
+def page_policy_sandbox():
+    st.title(t("nav_policy"))
+    st.markdown("LLM-proposed Rego policy modifications. Must be validated by Critic Agent before human approval.")
+    st.divider()
+
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        if st.button("Trigger Policy Proposal (Simulate LLM)"):
+            try:
+                r = requests.post(f"{ORCHESTRATOR_URL.replace('/route', '/policy/trigger')}", timeout=5)
+                if r.status_code == 200:
+                    st.success("Triggered successfully. Wait a few seconds for Critic Agent to validate.")
+            except Exception as e:
+                st.error(f"Trigger failed: {e}")
+
+    try:
+        r = requests.get(f"{ORCHESTRATOR_URL.replace('/route', '/policy/status')}", timeout=5)
+        status_data = r.json()
+    except:
+        st.warning("Failed to fetch policy status.")
+        return
+
+    active_policy = status_data.get("active_policy", "")
+    proposal_info = status_data.get("proposal", {})
+
+    has_proposal = proposal_info.get("has_proposal", False)
+    val_status = proposal_info.get("validation_results", {}).get("status", "NONE")
+    val_details = proposal_info.get("validation_results", {}).get("details", "")
+
+    if has_proposal:
+        st.info(f"**Proposal Validation Status:** {val_status}")
+        if val_details:
+            st.code(val_details)
+
+        col_act, col_prop = st.columns(2)
+        with col_act:
+            st.subheader("Active Rego Policy")
+            st.code(active_policy, language="rego")
+
+        with col_prop:
+            st.subheader("Proposed Rego Policy")
+            st.code(proposal_info.get("proposed_policy", ""), language="rego")
+
+        if val_status == "PASSED":
+            st.success("Critic Agent has validated this policy. Ready for deployment.")
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("Approve & Deploy to OPA", type="primary"):
+                    res = requests.post(f"{ORCHESTRATOR_URL.replace('/route', '/policy/approve')}", timeout=5).json()
+                    if res.get("status") == "success":
+                        st.success("Policy Approved & Deployed!")
+                    else:
+                        st.error(res.get("message"))
+            with c2:
+                if st.button("Reject"):
+                    requests.post(f"{ORCHESTRATOR_URL.replace('/route', '/policy/reject')}", timeout=5)
+                    st.rerun()
+        elif val_status == "REJECTED":
+            st.error("Critic Agent rejected this policy. You cannot deploy it.")
+            if st.button("Dismiss"):
+                requests.post(f"{ORCHESTRATOR_URL.replace('/route', '/policy/reject')}", timeout=5)
+                st.rerun()
+    else:
+        st.success("No pending policy proposals.")
+        st.subheader("Active Rego Policy")
+        st.code(active_policy, language="rego")
+
 def page_sandbox():
     st.markdown(f"### {t('nav_console')}")
     st.markdown(t("console_desc"))
-    
+
     api_key = st.session_state.get("api_key", os.getenv("CATS_API_KEY", ""))
     request_tag = st.session_state.get("request_tag", "default")
-    
+
     with st.container(height=500, border=False):
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
-                
+
     if prompt := st.chat_input(t("enter_prompt")):
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
-        
+
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             headers = {"X-API-Key": api_key} if api_key else {}
             payload = {"prompt": prompt, "request_tag": request_tag}
-            
+
             start_t = time.time()
             try:
                 with st.spinner(t("processing")):
                     res = requests.post(CHAT_ENDPOINT, json=payload, headers=headers, timeout=120)
                 duration_ms = int((time.time() - start_t) * 1000)
-                
+
                 if res.status_code == 200:
                     data = res.json()
                     content = data.get("data", {}).get("response", t("no_resp"))
@@ -442,7 +590,7 @@ def page_sandbox():
                     error_text = f"**{t('api_err')} {res.status_code}:**\\n```json\\n{res.text}\\n```"
                     message_placeholder.error(error_text)
                     st.session_state.messages.append({"role": "assistant", "content": error_text})
-                    
+
             except requests.exceptions.RequestException as e:
                 error_text = f"**{t('conn_failed')}** Gateway error: `{e}`"
                 message_placeholder.error(error_text)
@@ -452,16 +600,16 @@ def page_sandbox():
 def main():
     init_state()
     inject_css()
-    
+
     with st.sidebar:
         st.markdown(f"### {t('cats_control_plane')}")
-        
+
         st.session_state.api_key = st.text_input(t("api_key"), type="password", value=os.getenv("CATS_API_KEY", ""))
-        
+
         strategies = ["PROPOSED", "BASELINE-1", "BASELINE-2", "BASELINE-3"]
         selected_strategy = st.selectbox(
-            t("routing_strategy"), 
-            strategies, 
+            t("routing_strategy"),
+            strategies,
             index=strategies.index(st.session_state.current_strategy)
         )
         if selected_strategy != st.session_state.current_strategy:
@@ -473,9 +621,9 @@ def main():
                     st.rerun()
             except requests.exceptions.RequestException:
                 pass
-        
+
         st.session_state.request_tag = st.selectbox(t("request_tag"), ["default", "fast_ok", "high_quality"])
-        
+
         if st.button(t("clear_history")):
             st.session_state.messages = []
             st.session_state.telemetry_records = []
@@ -498,6 +646,9 @@ def main():
     pg = st.navigation([
         st.Page(page_sandbox, title=t("nav_console")),
         st.Page(page_route_explainability, title=t("nav_explain")),
+        st.Page(page_cost_analysis, title=t("nav_cost")),
+        st.Page(page_tuning, title=t("nav_tuning")),
+        st.Page(page_policy_sandbox, title=t("nav_policy")),
         st.Page(page_overview, title=t("nav_overview")),
         st.Page(page_telemetry, title=t("nav_telemetry")),
     ])

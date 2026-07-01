@@ -1,5 +1,6 @@
-import pytest
 import os
+
+import pytest
 
 # Set environment variables for testing before importing anything
 os.environ["CLOUD_INFERENCE_URL"] = "http://mock-cloud:11434"
@@ -12,7 +13,7 @@ os.environ["CATS_API_KEYS"] = "test-key-123"
 def reset_metrics_cache():
     """Reset the metrics cache before each test."""
     from metrics_cache import metrics_cache
-    
+
     # Re-initialize cache with defaults
     defaults = {
         "cloud_latency_ms": 0.0,
@@ -30,5 +31,5 @@ def reset_metrics_cache():
     }
     for k, v in defaults.items():
         metrics_cache.update(k, v)
-        
+
     yield

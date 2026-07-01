@@ -1,132 +1,127 @@
 import asyncio
 import json
 import random
-import time
+
 import httpx
 import structlog
+from config import settings
 from metrics_cache import metrics_cache
 from shared_state import shared_state
-from config import settings
 
 logger = structlog.get_logger("tuning_agent")
 
-ACTIONS = {
-    "BALANCED": {"w_latency": 0.30, "w_queue": 0.30, "w_compute": 0.25},
-    "LATENCY_FOCUS": {"w_latency": 0.50, "w_queue": 0.15, "w_compute": 0.20},
-    "THROUGHPUT_FOCUS": {"w_latency": 0.15, "w_queue": 0.45, "w_compute": 0.25}
-}
+# Base boundaries
+MIN_WEIGHT = 0.10
+MAX_WEIGHT = 0.60
 
-STATES = [
-    "STATE_NORMAL", 
-    "STATE_EDGE_LOADED", 
-    "STATE_DEGRADED", 
-    "STATE_BURST", 
-    "STATE_CRITICAL"
-]
-
-# Initialize Q-Table
-Q_TABLE = {s: {a: 0.0 for a in ACTIONS} for s in STATES}
-
-# Q-Learning Hyperparameters
-ALPHA = 0.1
-GAMMA = 0.9
-EPSILON = 0.15
-
-async def llm_warm_start():
-    """Calls the LLM to populate initial Q-Values for a warm start."""
+async def call_strategic_agent_for_tuning(current_state: str, metrics: dict, current_weights: dict):
+    """Consult the LLM (Tier-1) for a second opinion on parameter tuning."""
     api_url = f"{settings.strategic_agent_url}/api/generate"
-    prompt = """You are an AI supervisor initializing a Reinforcement Learning agent for network routing.
-For each of the following 5 network states, select the BEST routing action profile.
-States: STATE_NORMAL, STATE_EDGE_LOADED, STATE_DEGRADED, STATE_BURST, STATE_CRITICAL
-Actions: BALANCED, LATENCY_FOCUS, THROUGHPUT_FOCUS
+    prompt = f"""You are an AI supervisor for network routing.
+Current State: {current_state}
+Current Weights: {json.dumps(current_weights)}
+Metrics: {json.dumps({k: v for k, v in metrics.items() if 'latency' in k or 'inflight' in k})}
 
-Rules:
-- STATE_EDGE_LOADED means edge queue is full -> prioritize THROUGHPUT_FOCUS (queue).
-- STATE_DEGRADED means latency is high -> prioritize LATENCY_FOCUS.
-- Return ONLY a valid JSON object mapping State to Action. No markdown, no explanations.
-Example: {"STATE_NORMAL": "BALANCED", ...}
+Based on these metrics, suggest a new set of weights for w_latency, w_queue, and w_compute.
+The sum doesn't need to be 1.0, but each must be between 0.1 and 0.6.
+If latency is high, increase w_latency. If queues are high, increase w_queue.
+Return ONLY a JSON object: {{"w_latency": float, "w_queue": float, "w_compute": float}}.
+No markdown, no explanation.
 """
     payload = {"model": settings.strategic_agent_model, "prompt": prompt, "stream": False, "format": "json"}
-    
+
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             res = await client.post(api_url, json=payload)
             res.raise_for_status()
             response_text = res.json().get("response", "").strip()
-            
-            mapping = json.loads(response_text)
-            for state, action in mapping.items():
-                if state in Q_TABLE and action in ACTIONS:
-                    Q_TABLE[state][action] = 10.0 # Warm start boost
-            
-            logger.info("LLM Warm-Start completed", mapping=mapping)
-    except Exception as e:
-        logger.warning("LLM Warm-Start failed, falling back to empty Q-Table", error=str(e))
-        # Fallback manual warm start
-        Q_TABLE["STATE_NORMAL"]["BALANCED"] = 10.0
-        Q_TABLE["STATE_DEGRADED"]["LATENCY_FOCUS"] = 10.0
-        Q_TABLE["STATE_EDGE_LOADED"]["THROUGHPUT_FOCUS"] = 10.0
 
+            proposed = json.loads(response_text)
+
+            # Bounds checking
+            w_lat = max(MIN_WEIGHT, min(MAX_WEIGHT, float(proposed.get("w_latency", current_weights["w_latency"]))))
+            w_queue = max(MIN_WEIGHT, min(MAX_WEIGHT, float(proposed.get("w_queue", current_weights["w_queue"]))))
+            w_comp = max(MIN_WEIGHT, min(MAX_WEIGHT, float(proposed.get("w_compute", current_weights["w_compute"]))))
+
+            return {"w_latency": w_lat, "w_queue": w_queue, "w_compute": w_comp}
+    except Exception as e:
+        logger.warning("LLM Tuning failed, falling back to heuristics", error=str(e))
+        return None
+
+def apply_heuristics(state: str, current_weights: dict) -> dict:
+    """Fast, safe rule-based parameter tuning."""
+    w_lat = current_weights.get("w_latency", settings.w_latency)
+    w_queue = current_weights.get("w_queue", settings.w_queue)
+    w_comp = current_weights.get("w_compute", settings.w_compute)
+
+    step = 0.05
+
+    if state == "STATE_EDGE_LOADED":
+        w_queue = min(MAX_WEIGHT, w_queue + step)
+        w_comp = max(MIN_WEIGHT, w_comp - step)
+    elif state == "STATE_DEGRADED":
+        w_lat = min(MAX_WEIGHT, w_lat + step)
+    elif state == "STATE_BURST":
+        w_queue = min(MAX_WEIGHT, w_queue + step)
+        w_lat = max(MIN_WEIGHT, w_lat - step)
+    elif state == "STATE_NORMAL":
+        # Slowly decay back to defaults
+        w_lat += (settings.w_latency - w_lat) * 0.1
+        w_queue += (settings.w_queue - w_queue) * 0.1
+        w_comp += (settings.w_compute - w_comp) * 0.1
+
+    return {
+        "w_latency": round(w_lat, 3),
+        "w_queue": round(w_queue, 3),
+        "w_compute": round(w_comp, 3)
+    }
 
 async def run_tuning_loop():
-    logger.info("Starting Tuning Agent (Q-Learning + LLM Warm-Start)")
-    await llm_warm_start()
-    
-    last_state, _ = shared_state.get()
-    last_action = "BALANCED"
-    
+    logger.info("Starting Tuning Agent (Rule-based + LLM)")
+
     while True:
-        await asyncio.sleep(5.0) # Tuning interval
-        
+        await asyncio.sleep(30.0) # Tune every 30 seconds
+
         current_state, _ = shared_state.get()
-        
-        # Calculate Reward based on metrics
-        data = metrics_cache.get_all()
-        c_lat = data.get("cloud_latency_ms", 0.0)
-        e_lat = data.get("edge_latency_ms", 0.0)
-        c_inf = data.get("cloud_gateway_inflight", 0)
-        e_inf = data.get("edge_gateway_inflight", 0)
-        
-        avg_lat = (c_lat + e_lat) / 2.0
-        avg_inf = (c_inf + e_inf) / 2.0
-        
-        if avg_lat <= 0: avg_lat = 1.0
-        
-        # Reward formula: penalize high latency and high queues
-        reward = 1000.0 / (avg_lat + avg_inf * 10)
-        
-        # Bellman Update
-        max_q_next = max(Q_TABLE[current_state].values())
-        current_q = Q_TABLE[last_state][last_action]
-        Q_TABLE[last_state][last_action] += ALPHA * (reward + GAMMA * max_q_next - current_q)
-        
-        # Epsilon-Greedy Action Selection
-        if random.random() < EPSILON:
-            next_action = random.choice(list(ACTIONS.keys()))
-            is_exploration = True
-        else:
-            next_action = max(Q_TABLE[current_state], key=Q_TABLE[current_state].get)
-            is_exploration = False
-            
-        # Apply Action
-        weights = ACTIONS[next_action]
+        metrics = metrics_cache.get_all()
+        current_weights = shared_state.get_dynamic_weights()
+
+        # 1. Generate new weights via Heuristics
+        new_weights = apply_heuristics(current_state, current_weights)
+
+        # 2. Every 4th cycle (2 minutes), ask LLM for strategic tuning
+        if random.random() < 0.25:
+            llm_weights = await call_strategic_agent_for_tuning(current_state, metrics, current_weights)
+            if llm_weights:
+                new_weights = llm_weights
+                logger.info("Applied LLM-assisted tuning weights", weights=new_weights)
+
+        # 3. Apply to Sandbox
+        shared_state.set_sandbox_weights(
+            w_lat=new_weights["w_latency"],
+            w_queue=new_weights["w_queue"],
+            w_comp=new_weights["w_compute"]
+        )
+
+        # 4. Activate Canary (10% traffic will use sandbox_weights)
+        shared_state.set_canary_active(True)
+
+        # 5. For now (simulation), after a brief canary period, promote to dynamic
+        # In a real setup, we would evaluate canary success before promoting
+        # Here we just promote it automatically after 15 seconds
+        logger.info("Canary tuning active", sandbox=new_weights)
+
+        await asyncio.sleep(15.0)
+
+        # Promote Sandbox to Production (Dynamic)
         shared_state.update_dynamic_weights(
-            w_lat=weights["w_latency"], 
-            w_queue=weights["w_queue"], 
-            w_comp=weights["w_compute"]
+            w_lat=new_weights["w_latency"],
+            w_queue=new_weights["w_queue"],
+            w_comp=new_weights["w_compute"]
         )
-        
-        logger.debug(
-            "Tuning step completed", 
-            state=current_state, 
-            action=next_action, 
-            reward=round(reward, 2), 
-            explored=is_exploration,
-            q_values={k: round(v, 2) for k, v in Q_TABLE[current_state].items()}
-        )
-        
-        last_state = current_state
-        last_action = next_action
+        shared_state.set_canary_active(False)
+        logger.info("Sandbox weights promoted to Production", active_weights=new_weights)
+
 
 def start_tuning_agent():
     return asyncio.create_task(run_tuning_loop())

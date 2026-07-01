@@ -1,6 +1,5 @@
 """Type-safe configuration for the CATS Gateway via environment variables."""
 
-import os
 from pydantic_settings import BaseSettings
 
 

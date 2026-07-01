@@ -1,9 +1,10 @@
 """API Key Authentication Middleware."""
 
 import os
+
+import structlog
 from fastapi import Request
 from fastapi.responses import JSONResponse
-import structlog
 
 logger = structlog.get_logger("auth")
 
@@ -17,13 +18,13 @@ async def api_key_auth_middleware(request: Request, call_next):
         return await call_next(request)
 
     api_key = request.headers.get("X-API-Key")
-    
+
     if not api_key:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized", "detail": "Missing X-API-Key header"}
         )
-        
+
     if api_key not in VALID_API_KEYS:
         logger.warning("Invalid API Key attempt", path=request.url.path)
         return JSONResponse(

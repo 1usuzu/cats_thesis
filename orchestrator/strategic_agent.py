@@ -6,12 +6,16 @@ import time
 
 import httpx
 import structlog
-from metrics_cache import metrics_cache
-from shared_state import shared_state
-from routing_templates import ROUTING_TEMPLATES
 from config import settings
+from metrics_cache import metrics_cache
+from routing_templates import ROUTING_TEMPLATES
+from shared_state import shared_state
 
 logger = structlog.get_logger("strategic_agent")
+
+# Hysteresis state: prevents rapid state oscillation
+_pending_state: str | None = None
+_pending_count: int = 0
 
 
 def get_telemetry_summary() -> str:
@@ -123,7 +127,34 @@ Output the state label only."""
                 final_state = rule_based_fallback(metrics_cache.get_all())
                 logger.error("LLM request failed", error=str(e), fallback=final_state)
 
-            shared_state.update(final_state)
+            # Hysteresis: only transition if new state persists for N consecutive epochs
+            global _pending_state, _pending_count
+            current_active_state, _ = shared_state.get()
+
+            if final_state != current_active_state:
+                if final_state == _pending_state:
+                    _pending_count += 1
+                else:
+                    _pending_state = final_state
+                    _pending_count = 1
+
+                if _pending_count >= settings.hysteresis_epochs:
+                    shared_state.update(final_state)
+                    logger.info("State transitioned (hysteresis passed)",
+                                old_state=current_active_state,
+                                new_state=final_state,
+                                epochs_waited=_pending_count)
+                    _pending_state = None
+                    _pending_count = 0
+                else:
+                    logger.debug("Hysteresis holding",
+                                 pending=final_state,
+                                 count=_pending_count,
+                                 required=settings.hysteresis_epochs)
+            else:
+                # Current state matches active state, reset pending
+                _pending_state = None
+                _pending_count = 0
 
 
 def start_strategic_agent():

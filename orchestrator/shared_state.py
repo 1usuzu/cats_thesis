@@ -1,6 +1,8 @@
 import threading
-from routing_templates import ROUTING_TEMPLATES
+
 from config import settings
+from routing_templates import ROUTING_TEMPLATES
+
 
 class SharedState:
     def __init__(self):
@@ -13,6 +15,15 @@ class SharedState:
             "w_queue": settings.w_queue,
             "w_compute": settings.w_compute
         }
+        self.sandbox_weights = {
+            "w_latency": settings.w_latency,
+            "w_queue": settings.w_queue,
+            "w_compute": settings.w_compute
+        }
+        self.canary_active = False
+        self.has_proposal = False
+        self.proposed_policy = ""
+        self.validation_results = {}
 
     def update(self, state_label):
         with self.lock:
@@ -42,5 +53,49 @@ class SharedState:
     def get_dynamic_weights(self):
         with self.lock:
             return self.dynamic_weights.copy()
+
+    def set_sandbox_weights(self, w_lat: float, w_queue: float, w_comp: float):
+        with self.lock:
+            self.sandbox_weights["w_latency"] = w_lat
+            self.sandbox_weights["w_queue"] = w_queue
+            self.sandbox_weights["w_compute"] = w_comp
+
+    def get_sandbox_weights(self):
+        with self.lock:
+            return self.sandbox_weights.copy()
+
+    def set_canary_active(self, active: bool):
+        with self.lock:
+            self.canary_active = active
+
+    def is_canary_active(self):
+        with self.lock:
+            return self.canary_active
+
+    def get_policy_proposal(self):
+        with self.lock:
+            return {
+                "has_proposal": self.has_proposal,
+                "proposed_policy": self.proposed_policy,
+                "validation_results": self.validation_results.copy()
+            }
+
+    def set_policy_proposal(self, policy_text: str):
+        with self.lock:
+            self.has_proposal = True
+            self.proposed_policy = policy_text
+            self.validation_results = {"status": "PENDING"}
+
+    def update_policy_validation(self, status: str, details: str = ""):
+        with self.lock:
+            self.validation_results["status"] = status
+            if details:
+                self.validation_results["details"] = details
+
+    def clear_policy_proposal(self):
+        with self.lock:
+            self.has_proposal = False
+            self.proposed_policy = ""
+            self.validation_results = {}
 
 shared_state = SharedState()

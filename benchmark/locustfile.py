@@ -2,8 +2,9 @@ import json
 import os
 import random
 from pathlib import Path
+
 from dotenv import load_dotenv
-from locust import HttpUser, task, between, events
+from locust import HttpUser, between, events, task
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
@@ -23,7 +24,7 @@ class CATSUser(HttpUser):
     @task
     def send_chat(self):
         req_data = random.choice(PROMPTS)
-        
+
         with self.client.post("/v1/chat", json=req_data, catch_response=True) as response:
             if response.status_code == 200:
                 data = response.json()
@@ -38,7 +39,7 @@ class CATSUser(HttpUser):
                         exception=None,
                         context={},
                     )
-                    
+
                     # Record fallback metrics explicitly
                     if data.get("meta", {}).get("routing_analysis", {}).get("forced_fallback"):
                         events.request.fire(

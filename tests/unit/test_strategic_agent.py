@@ -1,5 +1,5 @@
-import pytest
 from strategic_agent import rule_based_fallback
+
 
 def test_rule_based_fallback_normal():
     data = {

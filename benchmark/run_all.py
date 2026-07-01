@@ -1,10 +1,10 @@
 import argparse
-import os
-import sys
 import asyncio
 import subprocess
+import sys
 import time
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent.parent / ".env")
@@ -33,19 +33,19 @@ LOAD_CONFIGS = {
 async def run_benchmark():
     total_runs = len(PROFILES) * len(LOADS) * len(STRATEGIES)
     current_run = 0
-    
+
     print("======================================================")
-    print(f"Starting CATS 24-Run Benchmark Matrix")
+    print("Starting CATS 24-Run Benchmark Matrix")
     print(f"Total scenarios: {total_runs}")
     print("======================================================")
-    
+
     for profile in PROFILES:
         for load in LOADS:
             for strategy in STRATEGIES:
                 current_run += 1
                 print(f"\n--- Running scenario {current_run}/{total_runs} ---")
                 print(f"Profile: {profile.upper()} | Load: {load.upper()} | Strategy: {strategy}")
-                
+
                 # 1. Isolate and prepare the state
                 try:
                     await prepare_experiment_state(network_profile=profile, strategy=strategy)
@@ -53,7 +53,7 @@ async def run_benchmark():
                     print(f"[ERROR] Failed to prepare experiment state: {e}")
                     print("[WARNING] Skipping to next scenario...")
                     continue
-                
+
                 # 2. Run Locust
                 config = LOAD_CONFIGS[load]
                 csv_prefix = RESULTS_DIR / f"benchmark_{profile}_{load}_{strategy}"
@@ -67,7 +67,7 @@ async def run_benchmark():
                     "-t", config["duration"],
                     "--csv", str(csv_prefix)
                 ]
-                
+
                 print(f"[INFO] Running Locust load test ({config['duration']})...")
                 start_time = time.time()
                 try:
@@ -81,7 +81,7 @@ async def run_benchmark():
                         text=True,
                         timeout=timeout_s
                     )
-                    
+
                     if result.returncode in [0,1]:
                         elapsed = round(time.time() - start_time, 2)
                         print(f"[SUCCESS] Load test completed successfully in {elapsed}s")
@@ -92,7 +92,7 @@ async def run_benchmark():
                     print(f"[ERROR] Locust process timed out after {timeout_s}s")
                 except Exception as e:
                     print(f"[ERROR] Unexpected error running Locust: {e}")
-                
+
                 # Brief sleep between runs to let OS sockets close
                 print("[INFO] Waiting 5 seconds before next scenario...")
                 time.sleep(5)

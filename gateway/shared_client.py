@@ -1,5 +1,6 @@
 import httpx
 
+
 class SharedClient:
     client: httpx.AsyncClient | None = None
 

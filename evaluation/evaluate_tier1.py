@@ -1,6 +1,7 @@
 import asyncio
-import httpx
 import json
+
+import httpx
 
 TEST_CASES = [
     {
@@ -63,10 +64,10 @@ TEST_CASES = [
 async def evaluate():
     correct = 0
     total = len(TEST_CASES)
-    
+
     # Needs Edge Node running Ollama for the strategic agent model
     url = "http://localhost:11435/api/generate"
-    
+
     async with httpx.AsyncClient(timeout=30.0) as client:
         for i, case in enumerate(TEST_CASES):
             prompt = f"""You are a system state classifier for an LLM inference orchestrator.
@@ -95,16 +96,16 @@ Output the state label only."""
                 })
                 res.raise_for_status()
                 output = res.json().get("response", "").strip().upper()
-                
+
                 # Check accuracy
                 match = case['expected'] in output
                 if match:
                     correct += 1
-                
+
                 print(f"[{'PASS' if match else 'FAIL'}] {case['name']} | Expected: {case['expected']} | Got: {output}")
             except Exception as e:
                 print(f"[ERROR] {case['name']} failed: {e}")
-                
+
     accuracy = (correct / total) * 100
     print(f"\nOverall Tier-1 Accuracy: {accuracy}% ({correct}/{total})")
 

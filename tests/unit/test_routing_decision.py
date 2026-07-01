@@ -1,7 +1,8 @@
 import pytest
-from main import get_routing_decision, RouteRequest
-from shared_state import shared_state
+from main import RouteRequest, get_routing_decision
 from metrics_cache import metrics_cache
+from shared_state import shared_state
+
 
 # We need to patch check_opa_safety so we don't actually hit the OPA server
 @pytest.fixture(autouse=True)
@@ -13,7 +14,7 @@ def mock_opa(monkeypatch):
         if site == "cloud" and request_tag == "fail_cloud":
             return False, ["CLOUD_SIMULATED_FAIL"], "enforced"
         return True, [], "enforced"
-        
+
     monkeypatch.setattr("main.check_opa_safety", mock_check_opa_safety)
 
 @pytest.mark.asyncio
@@ -21,10 +22,10 @@ async def test_routing_decision_normal():
     shared_state.update("STATE_NORMAL")
     metrics_cache.update("cloud_latency_ms", 10)
     metrics_cache.update("edge_latency_ms", 50)
-    
+
     req = RouteRequest(prompt="test", request_tag="default")
     res = await get_routing_decision(req)
-    
+
     assert res["decision"] in ["cloud", "edge"]
     assert "cats_scores" in res
     assert "decision_time_ms" in res
@@ -33,15 +34,18 @@ async def test_routing_decision_normal():
 
 @pytest.mark.asyncio
 async def test_routing_decision_opa_fallback():
+    import main
+    main._last_decision = None
+    main._last_decision_change_time = 0.0
     shared_state.update("STATE_NORMAL")
     # Make edge the preferred site (e.g. cloud latency huge)
     metrics_cache.update("cloud_latency_ms", 1000)
     metrics_cache.update("edge_latency_ms", 10)
-    
+
     # We use tag 'fail_edge' to trigger OPA rejection on edge
     req = RouteRequest(prompt="test", request_tag="fail_edge")
     res = await get_routing_decision(req)
-    
+
     # Even though edge was preferred, OPA rejected it, so it should fallback to cloud
     assert res["decision"] == "cloud"
     assert "EDGE_SIMULATED_FAIL" in res["opa_violations"]

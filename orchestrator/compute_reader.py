@@ -1,11 +1,10 @@
 """Async reader for compute metrics (CPU, GPU, Queue)."""
 
 import asyncio
-import structlog
-import httpx
 
-from metrics_cache import metrics_cache
+import structlog
 from config import settings
+from metrics_cache import metrics_cache
 
 logger = structlog.get_logger("compute_reader")
 
@@ -46,7 +45,7 @@ async def fetch_compute_util():
                     stderr=asyncio.subprocess.DEVNULL
                 )
                 stdout, _ = await proc.communicate()
-                
+
                 if proc.returncode == 0 and stdout:
                     gpu_util = float(stdout.decode().strip())
                     metrics_cache.update("cloud_gpu_util", gpu_util)

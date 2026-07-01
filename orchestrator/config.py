@@ -50,6 +50,19 @@ class OrchestratorSettings(BaseSettings):
     emergency_fallback_site: str = "cloud"
     min_score_delta: float = 0.05
 
+    # Phase 0: Route Decision Stability
+    hysteresis_epochs: int = 2          # State must persist N epochs before transition
+    cooldown_requests: int = 5          # Min requests before route can change
+    cooldown_seconds: float = 10.0      # Min seconds before route can change
+    ema_alpha: float = 0.3              # EMA smoothing factor (lower = smoother)
+
+    # Phase 2: Cost Model Configuration
+    cost_inference_cloud: float = 0.05       # Base cost per 1K tokens
+    cost_inference_edge: float = 0.01        # Base cost per 1K tokens
+    cost_network_cloud: float = 0.02         # Transfer cost to cloud
+    cost_network_edge: float = 0.0           # Transfer cost to edge (local)
+    cost_sla_penalty: float = 0.10           # Penalty cost when SLA is missed
+
     # Timing
     strategic_epoch_s: int = 30
     strategic_timeout_s: int = 5

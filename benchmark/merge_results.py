@@ -1,22 +1,23 @@
-import os
 import glob
-import pandas as pd
+import os
 from pathlib import Path
+
+import pandas as pd
 
 RESULTS_DIR = Path(__file__).parent / "results"
 
 def merge_results():
     stats_files = glob.glob(str(RESULTS_DIR / "*_stats.csv"))
-    
+
     summary_data = []
-    
+
     for f in stats_files:
         # Expected format: benchmark_{profile}_{load}_{strategy}_stats.csv
         basename = os.path.basename(f)
         parts = basename.replace("benchmark_", "").replace("_stats.csv", "").split("_")
         if len(parts) >= 3:
             profile, load, strategy = parts[0], parts[1], "_".join(parts[2:])
-            
+
             try:
                 df = pd.read_csv(f)
                 # Locust summary row is usually named "Aggregated"
@@ -26,9 +27,9 @@ def merge_results():
                     fails = agg_row["Failure Count"].values[0]
                     p95 = agg_row["95%"].values[0]
                     p99 = agg_row["99%"].values[0]
-                    
+
                     fail_rate = (fails / reqs * 100) if reqs > 0 else 0
-                    
+
                     summary_data.append({
                         "Profile": profile,
                         "Load": load,
@@ -41,7 +42,7 @@ def merge_results():
                     })
             except Exception as e:
                 print(f"Error reading {f}: {e}")
-                
+
     if summary_data:
         summary_df = pd.DataFrame(summary_data)
         summary_df = summary_df.sort_values(by=["Profile", "Load", "Strategy"])

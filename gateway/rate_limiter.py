@@ -1,11 +1,12 @@
 """Rate Limiting Middleware using Token Bucket algorithm."""
 
-import time
 import asyncio
-from fastapi import Request
-from fastapi.responses import JSONResponse
+import time
+
 import structlog
 from config import settings
+from fastapi import Request
+from fastapi.responses import JSONResponse
 
 logger = structlog.get_logger("rate_limiter")
 
@@ -22,7 +23,7 @@ class RateLimiter:
         async with self.lock:
             now = time.monotonic()
             elapsed = now - self.last_update
-            
+
             # Replenish tokens
             self.tokens = min(self.burst, self.tokens + elapsed * self.rate)
             self.last_update = now
@@ -50,5 +51,5 @@ async def rate_limit_middleware(request: Request, call_next):
             content={"error": "Too Many Requests"},
             headers={"Retry-After": "1"}
         )
-        
+
     return await call_next(request)
