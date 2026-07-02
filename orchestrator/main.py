@@ -299,6 +299,8 @@ async def get_routing_decision(req: RouteRequest):
             "is_canary": is_canary,
         }
 
+    primary_reason_str = "Score preference"
+
     if cloud_open:
         preferred_site = "edge"
         backup_site = "none"
@@ -318,12 +320,13 @@ async def get_routing_decision(req: RouteRequest):
             time_since_change = time.time() - _last_decision_change_time
             within_cooldown = (
                 _requests_since_change < settings.cooldown_requests
-                or time_since_change < settings.cooldown_seconds
+                and time_since_change < settings.cooldown_seconds
             )
             if within_cooldown:
                 # Hold the previous route (cooldown active)
                 preferred_site = _last_decision
                 backup_site = "edge" if preferred_site == "cloud" else "cloud"
+                primary_reason_str = "Hysteresis (Route Locked)"
                 logger.debug("Cooldown active, holding route",
                              held_site=preferred_site,
                              requests_since=_requests_since_change,
@@ -391,7 +394,7 @@ async def get_routing_decision(req: RouteRequest):
 
     explanation = {
         "summary": f"Routed to {decision.upper()}." + (" (FORCED FALLBACK)" if "FORCED_FALLBACK" in all_violations else ""),
-        "primary_reason": "Score preference" if allow else ("Fallback passed OPA" if "FORCED_FALLBACK" not in all_violations else "Best-Effort Fallback"),
+        "primary_reason": primary_reason_str if allow else ("Fallback passed OPA" if "FORCED_FALLBACK" not in all_violations else "Best-Effort Fallback"),
         "factors": [
             {"signal": f"{preferred_site}_final_score", "value": round(cloud_final if preferred_site=="cloud" else edge_final, 4)},
             {"signal": "opa_status", "value": opa_status},
