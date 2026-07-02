@@ -12,7 +12,7 @@ from circuit_breaker import circuit_breakers
 from config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from middleware import RequestIDMiddleware, TimingMiddleware
 from models import (
     APIResponse,
@@ -156,6 +156,22 @@ async def health_ready():
     all_ready = all(checks.values())
     status = "ready" if all_ready else "not_ready"
     return ReadinessResponse(status=status, checks=checks)
+
+
+@app.get("/metrics")
+async def get_metrics():
+    """Prometheus metrics endpoint."""
+    async with in_flight_lock:
+        cloud_q = in_flight["cloud"]
+        edge_q = in_flight["edge"]
+    
+    metrics = f"""# HELP gateway_inflight Number of in-flight requests per site
+# TYPE gateway_inflight gauge
+gateway_inflight{{site="cloud"}} {cloud_q}
+gateway_inflight{{site="edge"}} {edge_q}
+"""
+    return PlainTextResponse(metrics)
+
 
 
 @app.get("/health/sites")

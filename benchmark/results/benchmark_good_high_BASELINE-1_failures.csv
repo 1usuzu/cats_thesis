@@ -1,2 +1,2 @@
 Method,Name,Error,Occurrences,First Seen,Last Seen
-POST,/v1/chat,CatchResponseError('Failed with status code 500'),4,2026-07-02T08:56:08Z,2026-07-02T08:56:29Z
+POST,/v1/chat,CatchResponseError('Failed with status code 500'),7,2026-07-02T11:27:59Z,2026-07-02T11:28:30Z

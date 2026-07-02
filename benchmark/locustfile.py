@@ -8,12 +8,14 @@ from locust import HttpUser, between, events, task
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-# Load prompts
-try:
-    with open("data/prompts.json", "r") as f:
-        PROMPTS = json.load(f)
-except FileNotFoundError:
-    PROMPTS = [{"prompt": "Hello", "request_tag": "default"}]
+# Ensure prompts exist, do not silently fallback
+DATA_PATH = Path(__file__).parent / "data" / "prompts.json"
+if not DATA_PATH.exists():
+    raise FileNotFoundError(f"CRITICAL ERROR: Dataset not found at {DATA_PATH}. Benchmark must use a real dataset.")
+
+with open(DATA_PATH, "r") as f:
+    PROMPTS = json.load(f)
+
 
 class CATSUser(HttpUser):
     wait_time = between(0.5, 1.5)

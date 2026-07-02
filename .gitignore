@@ -2,6 +2,7 @@
 .env
 env/
 venv/
+.venv/
 
 # Cache của Python & Testing
 __pycache__/
@@ -9,6 +10,13 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE / Editor
+.vscode/
+*.swp
+*.swo
 
 # Agent/AI Tooling
 .agent/
@@ -25,6 +33,11 @@ edge-models/
 # Log
 *.log
 
+# Coverage
+coverage.xml
+htmlcov/
+.coverage
+
 # Dữ liệu rác của Docker (Mount volumes)
 prometheus-data/
 grafana-data/
@@ -32,3 +45,4 @@ grafana-data/
 # NGOẠI LỆ: Giữ lại minh chứng biểu đồ và kết quả chạy
 !analysis/plots/
 !benchmark/results/
+
