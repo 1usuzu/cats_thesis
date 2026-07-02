@@ -26,6 +26,23 @@ async def prepare_experiment_state(network_profile: str, strategy: str):
     """
     print(f"--- Preparing Experiment State: {network_profile.upper()} profile / {strategy} strategy ---")
 
+    # 0. Restart Gateway to guarantee absolute isolation and clear memory leaks
+    import subprocess
+    print("🔄 Restarting Gateway container to ensure clean state...")
+    subprocess.run(["docker", "compose", "restart", "gateway"], cwd=str(Path(__file__).parent.parent), check=True)
+    await asyncio.sleep(5)  # Allow it to boot
+
+    # Reset orchestrator metrics cache so it doesn't hold stale inflight counts
+    orchestrator_url = os.environ.get("ORCHESTRATOR_URL", "http://localhost:8080")
+    async with httpx.AsyncClient() as client:
+        try:
+            await client.post(f"{orchestrator_url}/metrics/update", json={
+                "cloud_inflight": 0, "edge_inflight": 0, "current_rps": 0.0,
+                "cloud_total_inference_ms": 0.0, "edge_total_inference_ms": 0.0
+            })
+        except Exception as e:
+            print(f"⚠️ Failed to reset orchestrator metrics: {e}")
+
     # 1. Update Strategy
     gateway_url = os.environ.get("GATEWAY_URL", "http://localhost:8000")
     api_key = os.environ.get("CATS_API_KEY", "")
@@ -52,7 +69,7 @@ async def prepare_experiment_state(network_profile: str, strategy: str):
 
     # 3. Wait for queues to drain (Gateway inflight = 0)
     orchestrator_url = os.environ.get("ORCHESTRATOR_URL", "http://localhost:8080")
-    max_wait = 60
+    max_wait = 135
     start = time.time()
 
     print("⏳ Waiting for queues to drain...", end="", flush=True)
