@@ -7,6 +7,7 @@ CATS (Context-Aware Traffic Steering) là hệ thống routing inference LLM gi�
 ### Yêu cầu
 - Docker và Docker Compose.
 - Python 3.10+ (cho việc phát triển và chạy test cục bộ).
+- Node.js 20+ (để dev Web UI).
 - GPU NVIDIA (cho cloud node) nếu có hỗ trợ.
 
 ### Cài đặt
@@ -21,6 +22,7 @@ CATS (Context-Aware Traffic Steering) là hệ thống routing inference LLM gi�
    ```
 
 ### Các dịch vụ chính
+- **Web UI**: `http://localhost:3001` (Giao diện chính)
 - **Gateway**: `http://localhost:8000`
 - **Orchestrator**: `http://localhost:8080`
 - **Cloud Node (Ollama)**: `http://localhost:11434`

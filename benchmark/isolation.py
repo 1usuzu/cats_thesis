@@ -14,7 +14,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 network_dir = Path(__file__).parent.parent / "network"
 sys.path.append(str(network_dir))
 
-from profiles import bad, good, medium
+from profiles import bad, good, medium  # type: ignore
 
 
 async def prepare_experiment_state(network_profile: str, strategy: str):

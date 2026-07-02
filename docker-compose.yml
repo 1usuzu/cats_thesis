@@ -130,7 +130,7 @@ services:
         condition: service_started
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-sf", "http://localhost:8080/health" ]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
       interval: 15s
       timeout: 5s
       retries: 3
@@ -165,7 +165,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-sf", "http://localhost:8000/health" ]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 15s
       timeout: 5s
       retries: 3
@@ -175,6 +175,33 @@ services:
         limits:
           cpus: "2.0"
           memory: 256M
+
+
+  # === WEB UI (Next.js) ===
+  
+  web:
+    build:
+      context: ./web
+    environment:
+      - GATEWAY_URL=http://gateway:8000
+      - ORCHESTRATOR_URL=http://orchestrator:8080
+    ports:
+      - "3001:3000"
+    networks:
+      - data-plane
+      - control-plane
+    depends_on:
+      gateway:
+        condition: service_healthy
+      orchestrator:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:3000" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # === TELEMETRY ===
 

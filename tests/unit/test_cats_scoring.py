@@ -79,5 +79,5 @@ def test_compute_cats_score_cases(site, tag, latency, queue, compute, expected):
     else:
         metrics_cache.update("edge_cpu_util", compute)
 
-    score, _ = compute_cats_score(site, tag)
+    score = compute_cats_score(site, tag)
     assert abs(score - expected) < 0.001
