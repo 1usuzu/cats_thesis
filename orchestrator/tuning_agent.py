@@ -106,21 +106,15 @@ async def run_tuning_loop():
         # 4. Activate Canary (10% traffic will use sandbox_weights)
         shared_state.set_canary_active(True)
 
-        # 5. For now (simulation), after a brief canary period, promote to dynamic
-        # In a real setup, we would evaluate canary success before promoting
-        # Here we just promote it automatically after 15 seconds
-        logger.info("Canary tuning active", sandbox=new_weights)
+        # 5. For now, stop auto-promotion and log that manual review is required.
+        logger.info("Canary tuning active. Manual promotion required pending validation.", sandbox=new_weights)
 
         await asyncio.sleep(15.0)
 
-        # Promote Sandbox to Production (Dynamic)
-        shared_state.update_dynamic_weights(
-            w_lat=new_weights["w_latency"],
-            w_queue=new_weights["w_queue"],
-            w_comp=new_weights["w_compute"]
-        )
+        # Do not automatically promote weights without validation
+        # shared_state.update_dynamic_weights(...)
         shared_state.set_canary_active(False)
-        logger.info("Sandbox weights promoted to Production", active_weights=new_weights)
+        logger.info("Sandbox canary evaluation ended. Awaiting validation pipeline for promotion.", active_weights=new_weights)
 
 
 def start_tuning_agent():

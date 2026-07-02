@@ -22,6 +22,10 @@ class GatewaySettings(BaseSettings):
     # SLA
     sla_target_ms: int = 500
 
+    # Emergency Fallback
+    emergency_override_enabled: bool = False
+    emergency_fallback_site: str = "cloud"
+
     # Rate limiting
     rate_limit_per_second: int = 100
     rate_limit_burst: int = 20

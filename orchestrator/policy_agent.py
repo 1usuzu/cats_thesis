@@ -1,11 +1,10 @@
 import asyncio
+import os
 
 import structlog
 from shared_state import shared_state
 
 logger = structlog.get_logger("policy_agent")
-
-import os
 
 POLICY_PATH = "/safety/policies/routing.rego" if os.path.exists("/safety/policies/routing.rego") else "safety/policies/routing.rego"
 
@@ -72,7 +71,7 @@ async def handle_anomaly(payload: dict):
         logger.error(f"Auto-proposal failed: {res['error']}")
         return
 
-    proposed_rego = shared_state.get_policy_proposal().get("proposed_rego")
+    proposed_rego = shared_state.get_policy_proposal().get("proposed_policy")
     if not proposed_rego:
         return
 
@@ -97,7 +96,7 @@ async def handle_predictive_alert(payload: dict):
         logger.error(f"Auto-proposal failed: {res['error']}")
         return
 
-    proposed_rego = shared_state.get_policy_proposal().get("proposed_rego")
+    proposed_rego = shared_state.get_policy_proposal().get("proposed_policy")
     if not proposed_rego:
         return
 

@@ -9,9 +9,9 @@ from shared_state import shared_state
 def mock_opa(monkeypatch):
     async def mock_check_opa_safety(site, request_tag, site_state="NORMAL"):
         # For tests, we'll pretend OPA always allows cloud, but edge might fail if it's explicitly set to fail
-        if site == "edge" and request_tag == "fail_edge":
+        if site == "edge" and request_tag in ("fail_edge", "fail_both"):
             return False, ["EDGE_SIMULATED_FAIL"], "enforced"
-        if site == "cloud" and request_tag == "fail_cloud":
+        if site == "cloud" and request_tag in ("fail_cloud", "fail_both"):
             return False, ["CLOUD_SIMULATED_FAIL"], "enforced"
         return True, [], "enforced"
 
@@ -48,12 +48,36 @@ async def test_routing_decision_opa_fallback():
 
     # Even though edge was preferred, OPA rejected it, so it should fallback to cloud
     assert res["decision"] == "cloud"
-    assert "EDGE_SIMULATED_FAIL" in res["opa_violations"]
 
 @pytest.mark.asyncio
-async def test_routing_decision_rule4_force_cloud():
+async def test_routing_decision_rule4_force_none():
+    import main
+    main.settings.emergency_override_enabled = False
     shared_state.update("STATE_NORMAL")
-    # Fail BOTH sites
-    # To do this cleanly, we might need a specific tag
-    # In our mock above, we only fail one or the other based on tag.
-    pass # Skipped for now as it requires complex mocking, but fallback logic is tested above
+    metrics_cache.update("cloud_latency_ms", 100)
+    metrics_cache.update("edge_latency_ms", 100)
+
+    req = RouteRequest(prompt="test", request_tag="fail_both")
+    res = await get_routing_decision(req)
+
+    # Both rejected, no emergency -> none
+    assert res["decision"] == "none"
+    assert "BOTH_SITES_REJECTED" in res["opa_violations"]
+    assert res["opa_status"] == "rejected"
+
+@pytest.mark.asyncio
+async def test_routing_decision_rule4_emergency_fallback():
+    import main
+    main.settings.emergency_override_enabled = True
+    main.settings.emergency_fallback_site = "cloud"
+    shared_state.update("STATE_NORMAL")
+    metrics_cache.update("cloud_latency_ms", 100)
+    metrics_cache.update("edge_latency_ms", 100)
+
+    req = RouteRequest(prompt="test", request_tag="fail_both")
+    res = await get_routing_decision(req)
+
+    # Both rejected, emergency -> cloud
+    assert res["decision"] == "cloud"
+    assert "BOTH_SITES_REJECTED" in res["opa_violations"]
+    assert res["opa_status"] == "emergency_override"

@@ -75,19 +75,24 @@ async def lifespan(app: FastAPI):
     tasks_comp = start_compute_reader()
     task_strat = start_strategic_agent()
     task_cost = asyncio.create_task(run_cost_loop())
-    task_tune = start_tuning_agent()
-    task_policy = asyncio.create_task(policy_agent_loop())
-    task_critic = asyncio.create_task(critic_agent_loop())
-    task_monitoring = start_monitoring_agent()
 
     background_tasks.append(task_tox)
     background_tasks.extend(tasks_comp)
     background_tasks.append(task_strat)
     background_tasks.append(task_cost)
-    background_tasks.append(task_tune)
-    background_tasks.append(task_policy)
-    background_tasks.append(task_critic)
-    background_tasks.append(task_monitoring)
+
+    if settings.enable_tuning_agent:
+        task_tune = start_tuning_agent()
+        background_tasks.append(task_tune)
+    if settings.enable_policy_agent:
+        task_policy = asyncio.create_task(policy_agent_loop())
+        background_tasks.append(task_policy)
+    if settings.enable_critic_agent:
+        task_critic = asyncio.create_task(critic_agent_loop())
+        background_tasks.append(task_critic)
+    if settings.enable_monitoring_agent:
+        task_monitoring = start_monitoring_agent()
+        background_tasks.append(task_monitoring)
 
     logger.info("Orchestrator background readers and agents started")
     yield
@@ -343,21 +348,37 @@ async def get_routing_decision(req: RouteRequest):
                 all_violations = backup_violations
             else:
                 all_violations = violations + backup_violations
-                decision = preferred_site
-                forced_fallback = True
-                all_violations.append("FORCED_FALLBACK")
-                logger.warning("Both sites rejected by OPA, applying Best-Effort Fallback", site=decision)
+                if settings.emergency_override_enabled:
+                    decision = settings.emergency_fallback_site
+                    forced_fallback = True
+                    all_violations.append("BOTH_SITES_REJECTED")
+                    logger.warning("Both sites rejected by OPA, applying Emergency Fallback", site=decision)
+                    opa_status = "emergency_override"
+                else:
+                    decision = "none"
+                    forced_fallback = False
+                    all_violations.append("BOTH_SITES_REJECTED")
+                    logger.warning("Both sites rejected by OPA and emergency override disabled. Rejecting route.")
+                    opa_status = "rejected"
         else:
             all_violations = violations
-            decision = preferred_site
-            forced_fallback = True
-            all_violations.append("FORCED_FALLBACK")
-            logger.warning("Available site rejected by OPA and backup is OPEN. Applying Best-Effort Fallback", site=decision)
+            if settings.emergency_override_enabled:
+                decision = settings.emergency_fallback_site
+                forced_fallback = True
+                all_violations.append("BOTH_SITES_REJECTED")
+                logger.warning("Available site rejected by OPA and backup is OPEN. Applying Emergency Fallback", site=decision)
+                opa_status = "emergency_override"
+            else:
+                decision = "none"
+                forced_fallback = False
+                all_violations.append("BOTH_SITES_REJECTED")
+                logger.warning("Available site rejected by OPA and backup is OPEN and emergency override disabled. Rejecting route.")
+                opa_status = "rejected"
 
     decision_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
     # Update cooldown tracking
-    if not cloud_open and not edge_open:
+    if not cloud_open and not edge_open and decision != "none":
         if _last_decision is not None and decision != _last_decision:
             _last_decision_change_time = time.time()
             _requests_since_change = 0

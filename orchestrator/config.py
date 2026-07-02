@@ -50,6 +50,13 @@ class OrchestratorSettings(BaseSettings):
     emergency_fallback_site: str = "cloud"
     min_score_delta: float = 0.05
 
+    # Feature Flags (Phase 3-6)
+    enable_tuning_agent: bool = False
+    enable_policy_agent: bool = False
+    enable_critic_agent: bool = False
+    enable_monitoring_agent: bool = False
+    enable_predictive_alerts: bool = False
+
     # Phase 0: Route Decision Stability
     hysteresis_epochs: int = 2          # State must persist N epochs before transition
     cooldown_requests: int = 5          # Min requests before route can change

@@ -202,8 +202,18 @@ async def chat(req: ChatRequest):
 
             routing_analysis = route_data
         except Exception as e:
-            logger.error("Orchestrator unavailable, falling back to cloud", error=str(e))
-            decision = "cloud"
+            if settings.emergency_override_enabled:
+                logger.warning("Orchestrator unavailable, applying Emergency Fallback", error=str(e), site=settings.emergency_fallback_site)
+                decision = settings.emergency_fallback_site
+            else:
+                logger.error("Orchestrator unavailable and emergency override disabled", error=str(e))
+                return JSONResponse(
+                    status_code=503,
+                    content=APIResponse(
+                        error="Orchestrator unavailable",
+                        meta={"detail": str(e), "orchestrator_unavailable": True}
+                    ).model_dump()
+                )
     elif settings.benchmark_strategy == "BASELINE-1":
         decision = next(rr_counter)
     elif settings.benchmark_strategy == "BASELINE-2":
