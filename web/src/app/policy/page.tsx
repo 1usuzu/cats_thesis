@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck, ShieldAlert, FileCode2, Wand2, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 
 export default function PolicyPage() {
   const { t } = useI18n();
@@ -74,99 +74,139 @@ export default function PolicyPage() {
   const valDetails = ((proposal.validation_results as Record<string, unknown>)?.details as string) || "";
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("nav_policy")}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+            <ShieldCheck className="size-6 text-emerald-500" />
+            {t("nav_policy")}
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             LLM-proposed Rego policy modifications. Must be validated by Critic Agent before human approval.
           </p>
         </div>
         <Button 
-          variant="outline" 
+          variant="default" 
           size="sm" 
           onClick={() => handleAction("trigger", "Triggered successfully. Wait a few seconds for Critic Agent to validate.")}
           disabled={actionLoading}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
         >
-          {actionLoading ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
-          Trigger Policy Proposal (Simulate LLM)
+          {actionLoading ? <Loader2 className="size-4 animate-spin mr-2" /> : <Wand2 className="size-4 mr-2" />}
+          Simulate Policy Proposal (LLM)
         </Button>
       </div>
 
       {hasProposal ? (
-        <div className="space-y-4">
-          <div className="rounded-md border border-border bg-card p-4">
-            <h3 className="font-semibold text-sm mb-2">Proposal Validation Status: {valStatus}</h3>
-            {valDetails && (
-              <pre className="bg-secondary p-3 rounded text-xs font-mono whitespace-pre-wrap mt-2 text-muted-foreground">
-                {valDetails}
-              </pre>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <h3 className="font-semibold text-sm">Active Rego Policy</h3>
-              <div className="rounded-md border border-border bg-card h-80 overflow-y-auto p-4">
-                <pre className="text-[11px] font-mono">{activePolicy}</pre>
-              </div>
+        <div className="space-y-6">
+          {/* Critic Validation Banner */}
+          <div className={`rounded-xl border p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center shadow-sm relative overflow-hidden ${
+            valStatus === "PASSED" ? "bg-emerald-500/5 border-emerald-500/20" : 
+            valStatus === "REJECTED" ? "bg-red-500/5 border-red-500/20" : 
+            "bg-secondary/20 border-border"
+          }`}>
+            <div className={`p-3 rounded-full shrink-0 ${
+              valStatus === "PASSED" ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : 
+              valStatus === "REJECTED" ? "bg-red-500/20 text-red-600 dark:text-red-400" : 
+              "bg-secondary text-muted-foreground"
+            }`}>
+              {valStatus === "PASSED" ? <CheckCircle2 className="size-6" /> : 
+               valStatus === "REJECTED" ? <XCircle className="size-6" /> : 
+               <Loader2 className="size-6 animate-spin" />}
             </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-sm text-blue-500">Proposed Rego Policy</h3>
-              <div className="rounded-md border border-border bg-card h-80 overflow-y-auto p-4">
-                <pre className="text-[11px] font-mono">{proposal.proposed_policy as string}</pre>
-              </div>
+            
+            <div className="flex-1">
+              <h3 className={`font-semibold text-base ${
+                valStatus === "PASSED" ? "text-emerald-600 dark:text-emerald-400" : 
+                valStatus === "REJECTED" ? "text-red-600 dark:text-red-400" : 
+                "text-foreground"
+              }`}>
+                Validation Status: {valStatus === "NONE" ? "VALIDATING..." : valStatus}
+              </h3>
+              {valDetails ? (
+                <div className="text-sm text-muted-foreground mt-1 line-clamp-2" title={valDetails}>
+                  {valDetails}
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground mt-1">Critic Agent is analyzing the proposed Rego policy for syntax errors and logical flaws...</div>
+              )}
             </div>
-          </div>
 
-          {valStatus === "PASSED" && (
-            <div className="flex gap-4 p-4 border border-emerald-500/20 bg-emerald-500/5 rounded-lg items-center justify-between">
-              <div className="text-sm text-emerald-600 font-medium">
-                Critic Agent has validated this policy. Ready for deployment.
-              </div>
-              <div className="flex gap-2">
+            {valStatus === "PASSED" && (
+              <div className="flex gap-2 shrink-0 w-full sm:w-auto">
                 <Button 
                   onClick={() => handleAction("approve", "Policy Approved & Deployed!")}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 sm:flex-none shadow-sm"
                   disabled={actionLoading}
                 >
-                  Approve & Deploy to OPA
+                  <ShieldCheck className="size-4 mr-1.5" /> Approve & Deploy
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={() => handleAction("reject", "Policy Rejected.")}
                   disabled={actionLoading}
+                  className="border-red-500/30 text-red-600 hover:bg-red-500/10"
                 >
                   Reject
                 </Button>
               </div>
-            </div>
-          )}
+            )}
 
-          {valStatus === "REJECTED" && (
-            <div className="flex gap-4 p-4 border border-red-500/20 bg-red-500/5 rounded-lg items-center justify-between">
-              <div className="text-sm text-red-600 font-medium">
-                Critic Agent rejected this policy. You cannot deploy it.
-              </div>
+            {valStatus === "REJECTED" && (
               <Button 
                 variant="outline"
                 onClick={() => handleAction("reject", "Policy Dismissed.")}
                 disabled={actionLoading}
+                className="w-full sm:w-auto border-border shrink-0"
               >
-                Dismiss
+                Dismiss Proposal
               </Button>
+            )}
+          </div>
+
+          {/* Split View for Code */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-border rounded-xl overflow-hidden shadow-sm relative">
+            <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 bg-background border border-border p-2 rounded-full shadow-sm text-muted-foreground">
+              <ArrowRight className="size-4" />
             </div>
-          )}
+            
+            <div className="border-b lg:border-b-0 lg:border-r border-border bg-card flex flex-col">
+              <div className="p-3 border-b border-border bg-secondary/30 flex items-center gap-2">
+                <FileCode2 className="size-4 text-muted-foreground" />
+                <h3 className="font-semibold text-sm">Active Rego Policy</h3>
+              </div>
+              <div className="p-4 h-[500px] overflow-y-auto">
+                <pre className="text-[11px] font-mono leading-relaxed text-muted-foreground selection:bg-primary/20">{activePolicy}</pre>
+              </div>
+            </div>
+            
+            <div className="bg-card flex flex-col relative">
+              <div className="p-3 border-b border-border bg-blue-500/5 flex items-center gap-2">
+                <Wand2 className="size-4 text-blue-500" />
+                <h3 className="font-semibold text-sm text-blue-600 dark:text-blue-400">Proposed Rego Policy</h3>
+              </div>
+              <div className="p-4 h-[500px] overflow-y-auto bg-blue-500/5">
+                <pre className="text-[11px] font-mono leading-relaxed text-blue-900/80 dark:text-blue-200/80 selection:bg-blue-500/20">{proposal.proposed_policy as string}</pre>
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="p-4 border border-emerald-500/20 bg-emerald-500/5 rounded-lg text-emerald-600 font-medium text-sm">
-            No pending policy proposals.
+        <div className="space-y-6">
+          <div className="p-5 border border-emerald-500/20 bg-emerald-500/5 rounded-xl flex items-center gap-3 shadow-sm">
+            <ShieldCheck className="size-6 text-emerald-600 dark:text-emerald-400" />
+            <div>
+              <div className="text-emerald-700 dark:text-emerald-400 font-semibold">No pending policy proposals.</div>
+              <div className="text-emerald-600/80 dark:text-emerald-400/80 text-sm mt-0.5">The current Open Policy Agent (OPA) routing rules are stable.</div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-sm">Active Rego Policy</h3>
-            <div className="rounded-md border border-border bg-card h-96 overflow-y-auto p-4">
-              <pre className="text-[11px] font-mono">{activePolicy}</pre>
+          <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-card">
+            <div className="p-3 border-b border-border bg-secondary/30 flex items-center gap-2">
+              <FileCode2 className="size-4 text-muted-foreground" />
+              <h3 className="font-semibold text-sm">Active Rego Policy (Deployed)</h3>
+            </div>
+            <div className="p-4 h-[600px] overflow-y-auto">
+              <pre className="text-[11px] font-mono leading-relaxed text-foreground selection:bg-primary/20">{activePolicy}</pre>
             </div>
           </div>
         </div>

@@ -63,12 +63,12 @@ class OrchestratorSettings(BaseSettings):
     cooldown_seconds: float = 10.0      # Min seconds before route can change
     ema_alpha: float = 0.3              # EMA smoothing factor (lower = smoother)
 
-    # Phase 2: Cost Model Configuration
-    cost_inference_cloud: float = 0.05       # Base cost per 1K tokens
-    cost_inference_edge: float = 0.01        # Base cost per 1K tokens
-    cost_network_cloud: float = 0.02         # Transfer cost to cloud
-    cost_network_edge: float = 0.0           # Transfer cost to edge (local)
-    cost_sla_penalty: float = 0.10           # Penalty cost when SLA is missed
+    # Phase 2: Cost Model Configuration (Tuned for Gemini Flash)
+    cost_inference_cloud: float = 0.00015    # Base cost (per 1K tokens)
+    cost_inference_edge: float = 0.00002     # Base cost (electricity/hardware depreciation)
+    cost_network_cloud: float = 0.00005      # Transfer overhead cost to cloud
+    cost_network_edge: float = 0.00000       # Transfer cost to edge (local)
+    cost_sla_penalty: float = 0.001          # Penalty cost when SLA is missed
 
     # Timing
     strategic_epoch_s: int = 30
