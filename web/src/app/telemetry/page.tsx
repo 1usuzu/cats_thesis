@@ -65,7 +65,7 @@ export default function TelemetryPage() {
             {t("nav_telemetry")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Giám sát trực tiếp sức khỏe hệ thống và các chỉ số (metrics) thời gian thực.
+            {t("health_desc")}
           </p>
         </div>
       </div>
@@ -80,43 +80,43 @@ export default function TelemetryPage() {
           <div className={`text-3xl font-bold font-mono tracking-tight ${isHighQueue ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
             {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : `${total_q}`}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">Số lượng Request đang xử lý</div>
+          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_req_in_flight")}</div>
         </div>
 
         {/* Edge CPU Box */}
         <div className={`rounded-xl border p-5 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighCpu ? 'bg-red-500/10 border-red-500/30' : 'bg-card border-border'}`}>
           <div className={`absolute -right-2 -top-2 opacity-5 ${isHighCpu ? 'text-red-500' : 'text-muted-foreground'}`}><Cpu className="size-24"/></div>
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
-             <Cpu className="size-4" /> CPU của Edge
+             <Cpu className="size-4" /> {t("edge_cpu")}
           </div>
           <div className={`text-3xl font-bold font-mono tracking-tight ${isHighCpu ? 'text-red-600 dark:text-red-400' : 'text-foreground'}`}>
             {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : `${edge_cpu.toFixed(1)}%`}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">Tải CPU/GPU cục bộ</div>
+          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_cpu_load")}</div>
         </div>
 
         {/* Latency Box */}
         <div className={`rounded-xl border p-5 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighLatency ? 'bg-amber-500/10 border-amber-500/30' : 'bg-card border-border'}`}>
           <div className={`absolute -right-2 -top-2 opacity-5 ${isHighLatency ? 'text-amber-500' : 'text-muted-foreground'}`}><Clock className="size-24"/></div>
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
-             <Clock className="size-4" /> Độ trễ mạng
+             <Clock className="size-4" /> {t("net_latency")}
           </div>
           <div className={`text-3xl font-bold font-mono tracking-tight ${isHighLatency ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
             {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : `${latency}ms`}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">Độ trễ giả lập bởi Toxiproxy</div>
+          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_net_delay")}</div>
         </div>
 
         {/* Proxy Box */}
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 shadow-sm relative overflow-hidden">
           <div className="absolute -right-2 -top-2 opacity-5 text-emerald-500"><Network className="size-24"/></div>
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
-             <Network className="size-4" /> Trạng thái Proxy
+             <Network className="size-4" /> {t("proxy_status")}
           </div>
           <div className="text-3xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400">
             {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : proxy_val}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">Toxiproxy Control Plane</div>
+          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_proxy_cp")}</div>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default function TelemetryPage() {
         <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-secondary/30 sticky top-0">
            <h2 className="text-sm font-semibold flex items-center gap-2 text-foreground">
              <Terminal className="size-4 text-muted-foreground" />
-             Dữ liệu Telemetry thô (JSON)
+             {t("tel_raw")}
            </h2>
            
            <div className="flex items-center gap-4">
@@ -133,7 +133,7 @@ export default function TelemetryPage() {
                  onClick={() => setIsPaused(false)}
                  className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors font-medium bg-amber-500/10 px-2 py-1 rounded"
                >
-                 <PlayCircle className="size-3.5" /> Đã tạm dừng
+                 <PlayCircle className="size-3.5" /> {t("tel_paused")}
                </button>
              ) : (
                <button 
@@ -144,7 +144,7 @@ export default function TelemetryPage() {
                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                  </span>
-                 Live Stream
+                 {t("tel_live")}
                </button>
              )}
            </div>
@@ -156,7 +156,7 @@ export default function TelemetryPage() {
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground py-10">
                <Activity className="size-8 mb-3 animate-pulse opacity-50" />
-               Đang chờ tín hiệu telemetry...
+               {t("tel_waiting")}
             </div>
           )}
         </div>

@@ -82,18 +82,18 @@ export default function PolicyPage() {
             {t("nav_policy")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Chính sách định tuyến do LLM đề xuất. Cần được Critic Agent xác thực (validate) trước khi người dùng phê duyệt.
+            {t("policy_desc")}
           </p>
         </div>
         <Button 
           variant="default" 
           size="sm" 
-          onClick={() => handleAction("trigger", "Đã kích hoạt. Vui lòng chờ Critic Agent xác thực.")}
+          onClick={() => handleAction("trigger", t("val_desc"))}
           disabled={actionLoading}
           className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
         >
           {actionLoading ? <Loader2 className="size-4 animate-spin mr-2" /> : <Wand2 className="size-4 mr-2" />}
-          Mô phỏng Đề xuất (LLM)
+          {t("btn_simulate")}
         </Button>
       </div>
 
@@ -121,33 +121,33 @@ export default function PolicyPage() {
                 valStatus === "REJECTED" ? "text-red-600 dark:text-red-400" : 
                 "text-foreground"
               }`}>
-                Trạng thái xác thực: {valStatus === "NONE" ? "ĐANG KIỂM TRA..." : valStatus}
+                {t("val_status")}: {valStatus === "NONE" ? t("val_validating") : valStatus}
               </h3>
               {valDetails ? (
                 <div className="text-sm text-muted-foreground mt-1 line-clamp-2" title={valDetails}>
                   {valDetails}
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground mt-1">Critic Agent đang phân tích các lỗi cú pháp và logic trong Rego policy...</div>
+                <div className="text-sm text-muted-foreground mt-1">{t("val_desc")}</div>
               )}
             </div>
 
             {valStatus === "PASSED" && (
               <div className="flex gap-2 shrink-0 w-full sm:w-auto">
                 <Button 
-                  onClick={() => handleAction("approve", "Đã phê duyệt và áp dụng Policy!")}
+                  onClick={() => handleAction("approve", "Policy Approved & Deployed!")}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 sm:flex-none shadow-sm"
                   disabled={actionLoading}
                 >
-                  <ShieldCheck className="size-4 mr-1.5" /> Phê duyệt & Áp dụng
+                  <ShieldCheck className="size-4 mr-1.5" /> {t("btn_approve")}
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => handleAction("reject", "Đã từ chối Policy.")}
+                  onClick={() => handleAction("reject", "Policy Rejected.")}
                   disabled={actionLoading}
                   className="border-red-500/30 text-red-600 hover:bg-red-500/10"
                 >
-                  Từ chối
+                  {t("btn_reject")}
                 </Button>
               </div>
             )}
@@ -155,11 +155,11 @@ export default function PolicyPage() {
             {valStatus === "REJECTED" && (
               <Button 
                 variant="outline"
-                onClick={() => handleAction("reject", "Đã bỏ qua đề xuất.")}
+                onClick={() => handleAction("reject", "Policy Dismissed.")}
                 disabled={actionLoading}
                 className="w-full sm:w-auto border-border shrink-0"
               >
-                Bỏ qua
+                {t("btn_dismiss")}
               </Button>
             )}
           </div>
@@ -173,7 +173,7 @@ export default function PolicyPage() {
             <div className="border-b lg:border-b-0 lg:border-r border-border bg-card flex flex-col max-h-[60vh]">
               <div className="p-3 border-b border-border bg-secondary/30 flex items-center gap-2 sticky top-0">
                 <FileCode2 className="size-4 text-muted-foreground" />
-                <h3 className="font-semibold text-sm">Policy Hiện Tại</h3>
+                <h3 className="font-semibold text-sm">{t("active_policy")}</h3>
               </div>
               <div className="p-4 overflow-y-auto">
                 <pre className="text-[11px] font-mono leading-relaxed text-muted-foreground selection:bg-primary/20">{activePolicy}</pre>
@@ -183,7 +183,7 @@ export default function PolicyPage() {
             <div className="bg-card flex flex-col relative max-h-[60vh]">
               <div className="p-3 border-b border-border bg-blue-500/5 flex items-center gap-2 sticky top-0 z-10">
                 <Wand2 className="size-4 text-blue-500" />
-                <h3 className="font-semibold text-sm text-blue-600 dark:text-blue-400">Policy Đề Xuất</h3>
+                <h3 className="font-semibold text-sm text-blue-600 dark:text-blue-400">{t("proposed_policy")}</h3>
               </div>
               <div className="p-4 overflow-y-auto bg-blue-500/5">
                 <pre className="text-[11px] font-mono leading-relaxed text-blue-900/80 dark:text-blue-200/80 selection:bg-blue-500/20">{proposal.proposed_policy as string}</pre>
@@ -196,14 +196,14 @@ export default function PolicyPage() {
           <div className="p-5 border border-emerald-500/20 bg-emerald-500/5 rounded-xl flex items-center gap-3 shadow-sm">
             <ShieldCheck className="size-6 text-emerald-600 dark:text-emerald-400" />
             <div>
-              <div className="text-emerald-700 dark:text-emerald-400 font-semibold">Không có đề xuất Policy nào đang chờ duyệt.</div>
-              <div className="text-emerald-600/80 dark:text-emerald-400/80 text-sm mt-0.5">Luật định tuyến Open Policy Agent (OPA) hiện tại đang hoạt động ổn định.</div>
+              <div className="text-emerald-700 dark:text-emerald-400 font-semibold">{t("no_proposals")}</div>
+              <div className="text-emerald-600/80 dark:text-emerald-400/80 text-sm mt-0.5">{t("opa_stable")}</div>
             </div>
           </div>
           <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-card max-h-[60vh] flex flex-col">
             <div className="p-3 border-b border-border bg-secondary/30 flex items-center gap-2 sticky top-0">
               <FileCode2 className="size-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm">Policy Hiện Tại (Deployed)</h3>
+              <h3 className="font-semibold text-sm">{t("active_policy_deployed")}</h3>
             </div>
             <div className="p-4 overflow-y-auto">
               <pre className="text-[11px] font-mono leading-relaxed text-foreground selection:bg-primary/20">{activePolicy}</pre>

@@ -71,7 +71,7 @@ export default function CostPage() {
                   <Cloud className="size-32" />
                 </div>
                 <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold mb-4">
-                  <Cloud className="size-5" /> Cloud Expected Cost (Gemini Flash)
+                  <Cloud className="size-5" /> {t("cost_cloud_exp")}
                 </div>
                 
                 <div className="flex items-baseline gap-2 mb-6">
@@ -83,11 +83,11 @@ export default function CostPage() {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center border-b border-blue-500/10 pb-2">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><Calculator className="size-3.5"/> Base API Cost</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><Calculator className="size-3.5"/> {t("cost_base_api")}</span>
                     <span className="font-mono font-medium">${GEMINI_BASE_COST.toFixed(5)}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-blue-500/10 pb-2">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="size-3.5 text-amber-500"/> Network Overhead & Retry Risk</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="size-3.5 text-amber-500"/> {t("cost_net_risk")}</span>
                     <span className="font-mono text-amber-600 dark:text-amber-400">
                       +${(selectedRecord.cloud_expected_cost - GEMINI_BASE_COST).toFixed(5)}
                     </span>
@@ -101,7 +101,7 @@ export default function CostPage() {
                   <Cpu className="size-32" />
                 </div>
                 <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold mb-4">
-                  <Cpu className="size-5" /> Edge Expected Cost (Local GPU)
+                  <Cpu className="size-5" /> {t("cost_edge_exp")}
                 </div>
                 
                 <div className="flex items-baseline gap-2 mb-6">
@@ -113,11 +113,11 @@ export default function CostPage() {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center border-b border-emerald-500/10 pb-2">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><Calculator className="size-3.5"/> Base Hardware Cost</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><Calculator className="size-3.5"/> {t("cost_base_hw")}</span>
                     <span className="font-mono font-medium">${EDGE_BASE_COST.toFixed(5)}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-emerald-500/10 pb-2">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><AlertTriangle className="size-3.5 text-red-500"/> SLA Miss & Capacity Risk</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><AlertTriangle className="size-3.5 text-red-500"/> {t("cost_sla_risk")}</span>
                     <span className="font-mono text-red-600 dark:text-red-400">
                       +${Math.max(0, selectedRecord.edge_expected_cost - EDGE_BASE_COST).toFixed(5)}
                     </span>
@@ -130,18 +130,18 @@ export default function CostPage() {
 
           <div className="space-y-4 pt-4 border-t border-border/50">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <TrendingUp className="size-5 text-muted-foreground" /> Historical Cost Overview
+              <TrendingUp className="size-5 text-muted-foreground" /> {t("cost_hist")}
             </h3>
             <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
               <Table>
                 <TableHeader className="bg-secondary/50">
                   <TableRow>
-                    <TableHead className="font-mono text-xs w-[180px]">Timestamp</TableHead>
-                    <TableHead className="font-mono text-xs w-[120px]">Request ID</TableHead>
-                    <TableHead className="font-mono text-xs">Tag</TableHead>
-                    <TableHead className="font-mono text-xs w-[100px]">Route</TableHead>
-                    <TableHead className="font-mono text-xs text-right text-blue-600/70 dark:text-blue-400/70">Cloud Cost</TableHead>
-                    <TableHead className="font-mono text-xs text-right text-emerald-600/70 dark:text-emerald-400/70">Edge Cost</TableHead>
+                    <TableHead className="font-mono text-xs w-[180px]">{t("cost_ts")}</TableHead>
+                    <TableHead className="font-mono text-xs w-[120px]">{t("cost_req_id")}</TableHead>
+                    <TableHead className="font-mono text-xs">{t("cost_tag")}</TableHead>
+                    <TableHead className="font-mono text-xs w-[100px]">{t("cost_route")}</TableHead>
+                    <TableHead className="font-mono text-xs text-right text-blue-600/70 dark:text-blue-400/70">{t("cloud_exp_cost")}</TableHead>
+                    <TableHead className="font-mono text-xs text-right text-emerald-600/70 dark:text-emerald-400/70">{t("edge_exp_cost")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

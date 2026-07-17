@@ -88,12 +88,12 @@ export default function TuningPage() {
             {t("nav_tuning")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Monitor Auto-Tuning heuristics and Canary validation in real-time.
+            {t("tuning_desc")}
           </p>
         </div>
         
         <div className="flex items-center gap-2 text-xs font-semibold bg-secondary/30 border px-3 py-1.5 rounded-lg text-indigo-600 dark:text-indigo-400">
-          <Bot className="size-4" /> AI Tuning Agent Active
+          <Bot className="size-4" /> {t("tuning_ai_active")}
         </div>
       </div>
 
@@ -113,9 +113,9 @@ export default function TuningPage() {
           </div>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-lg font-bold flex items-center gap-2 text-primary">
-               Production Weights
+               {t("tuning_prod_w")}
             </h2>
-            <div className="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-md">90% TRAFFIC</div>
+            <div className="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-md">90% {t("tuning_traffic")}</div>
           </div>
           
           <div className="space-y-2 relative z-10">
@@ -133,15 +133,15 @@ export default function TuningPage() {
           
           <div className="flex items-center justify-between mb-8 relative z-10">
             <h2 className={`text-lg font-bold flex items-center gap-2 ${canaryActive ? 'text-amber-600 dark:text-amber-500' : 'text-muted-foreground'}`}>
-              Canary Weights
+              {t("tuning_canary_w")}
             </h2>
             {canaryActive ? (
               <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500 text-xs font-bold bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20 shadow-sm animate-pulse">
-                <Zap className="size-3" /> TESTING 10% TRAFFIC
+                <Zap className="size-3" /> {t("tuning_testing")} 10% {t("tuning_traffic")}
               </span>
             ) : (
               <span className="flex items-center gap-1.5 text-muted-foreground text-xs font-bold bg-secondary px-2 py-1 rounded-md border border-border">
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground"></span> IDLE (0% TRAFFIC)
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground"></span> {t("tuning_idle")} (0% {t("tuning_traffic")})
               </span>
             )}
           </div>
@@ -158,11 +158,10 @@ export default function TuningPage() {
         <Bot className="size-5 text-muted-foreground mt-0.5" />
         <div className="text-sm text-foreground space-y-1">
           <p>
-            <strong>Tuning Agent Explanation:</strong> The AI Tuning Agent continuously observes telemetry metrics (latency, queue depth, error rates) in the background. 
-            When it detects performance degradation, it proposes new routing weights (<code className="bg-secondary px-1 py-0.5 rounded text-xs">Canary Weights</code>) and routes 10% of traffic to validate them.
+            <strong>{t("tuning_expl_title")}</strong> {t("tuning_expl_1")}
           </p>
           <p className="text-muted-foreground text-xs">
-            If the canary traffic shows improved SLA compliance, the weights are automatically promoted to Production. If not, they are rolled back instantly.
+            {t("tuning_expl_2")}
           </p>
         </div>
       </div>
