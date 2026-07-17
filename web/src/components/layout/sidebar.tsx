@@ -20,9 +20,6 @@ export function Sidebar() {
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col h-full shrink-0">
       <Link href="/" className="h-14 border-b border-border flex items-center gap-3 px-4 hover:bg-secondary/50 transition-colors">
-        <div className="size-6 bg-primary rounded flex items-center justify-center shrink-0">
-          <span className="text-primary-foreground font-bold text-xs">C</span>
-        </div>
         <span className="font-semibold text-sm truncate">CATS Control Plane</span>
       </Link>
       <nav className="flex-1 overflow-y-auto py-4">

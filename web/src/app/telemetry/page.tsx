@@ -60,8 +60,7 @@ export default function TelemetryPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <Activity className="size-6 text-pink-500" />
+          <h1 className="text-2xl font-semibold tracking-tight">
             {t("nav_telemetry")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -70,53 +69,53 @@ export default function TelemetryPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Queue Box */}
-        <div className={`rounded-xl border p-5 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighQueue ? 'bg-amber-500/10 border-amber-500/30' : 'bg-card border-border'}`}>
-          <div className={`absolute -right-2 -top-2 opacity-5 ${isHighQueue ? 'text-amber-500' : 'text-muted-foreground'}`}><Activity className="size-24"/></div>
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
-             <Activity className="size-4" /> {t("gw_queue")}
+        <div className={`rounded-xl border p-4 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighQueue ? 'bg-amber-500/10 border-amber-500/30' : 'bg-card border-border'}`}>
+          <div className={`absolute -right-2 -top-2 opacity-5 ${isHighQueue ? 'text-amber-500' : 'text-muted-foreground'}`}><Activity className="size-16"/></div>
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
+             <Activity className="size-4" /> Gateway Queue
           </div>
-          <div className={`text-3xl font-bold font-mono tracking-tight ${isHighQueue ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
-            {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : `${total_q}`}
+          <div className={`text-2xl font-bold font-mono tracking-tight ${isHighQueue ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
+            {loading && !telemetryData ? <Loader2 className="size-5 animate-spin mt-1" /> : `${total_q}`}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_req_in_flight")}</div>
+          <div className="text-[11px] text-muted-foreground mt-1 font-medium">{t("tel_req_in_flight")}</div>
         </div>
 
         {/* Edge CPU Box */}
-        <div className={`rounded-xl border p-5 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighCpu ? 'bg-red-500/10 border-red-500/30' : 'bg-card border-border'}`}>
-          <div className={`absolute -right-2 -top-2 opacity-5 ${isHighCpu ? 'text-red-500' : 'text-muted-foreground'}`}><Cpu className="size-24"/></div>
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+        <div className={`rounded-xl border p-4 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighCpu ? 'bg-red-500/10 border-red-500/30' : 'bg-card border-border'}`}>
+          <div className={`absolute -right-2 -top-2 opacity-5 ${isHighCpu ? 'text-red-500' : 'text-muted-foreground'}`}><Cpu className="size-16"/></div>
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
              <Cpu className="size-4" /> {t("edge_cpu")}
           </div>
-          <div className={`text-3xl font-bold font-mono tracking-tight ${isHighCpu ? 'text-red-600 dark:text-red-400' : 'text-foreground'}`}>
-            {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : `${edge_cpu.toFixed(1)}%`}
+          <div className={`text-2xl font-bold font-mono tracking-tight ${isHighCpu ? 'text-red-600 dark:text-red-400' : 'text-foreground'}`}>
+            {loading && !telemetryData ? <Loader2 className="size-5 animate-spin mt-1" /> : `${edge_cpu.toFixed(1)}%`}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_cpu_load")}</div>
+          <div className="text-[11px] text-muted-foreground mt-1 font-medium">{t("tel_cpu_load")}</div>
         </div>
 
         {/* Latency Box */}
-        <div className={`rounded-xl border p-5 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighLatency ? 'bg-amber-500/10 border-amber-500/30' : 'bg-card border-border'}`}>
-          <div className={`absolute -right-2 -top-2 opacity-5 ${isHighLatency ? 'text-amber-500' : 'text-muted-foreground'}`}><Clock className="size-24"/></div>
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+        <div className={`rounded-xl border p-4 shadow-sm transition-colors duration-500 relative overflow-hidden ${isHighLatency ? 'bg-amber-500/10 border-amber-500/30' : 'bg-card border-border'}`}>
+          <div className={`absolute -right-2 -top-2 opacity-5 ${isHighLatency ? 'text-amber-500' : 'text-muted-foreground'}`}><Clock className="size-16"/></div>
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
              <Clock className="size-4" /> {t("net_latency")}
           </div>
-          <div className={`text-3xl font-bold font-mono tracking-tight ${isHighLatency ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
-            {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : `${latency}ms`}
+          <div className={`text-2xl font-bold font-mono tracking-tight ${isHighLatency ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
+            {loading && !telemetryData ? <Loader2 className="size-5 animate-spin mt-1" /> : `${latency}ms`}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_net_delay")}</div>
+          <div className="text-[11px] text-muted-foreground mt-1 font-medium">{t("tel_net_delay")}</div>
         </div>
 
         {/* Proxy Box */}
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 shadow-sm relative overflow-hidden">
-          <div className="absolute -right-2 -top-2 opacity-5 text-emerald-500"><Network className="size-24"/></div>
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 shadow-sm relative overflow-hidden">
+          <div className="absolute -right-2 -top-2 opacity-5 text-emerald-500"><Network className="size-16"/></div>
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
              <Network className="size-4" /> {t("proxy_status")}
           </div>
-          <div className="text-3xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400">
-            {loading && !telemetryData ? <Loader2 className="size-6 animate-spin mt-1" /> : proxy_val}
+          <div className="text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400">
+            {loading && !telemetryData ? <Loader2 className="size-5 animate-spin mt-1" /> : proxy_val}
           </div>
-          <div className="text-xs text-muted-foreground mt-1 font-medium">{t("tel_proxy_cp")}</div>
+          <div className="text-[11px] text-muted-foreground mt-1 font-medium">{t("tel_proxy_cp")}</div>
         </div>
       </div>
 
@@ -150,7 +149,7 @@ export default function TelemetryPage() {
            </div>
         </div>
         
-        <div className="p-4 max-h-[60vh] overflow-y-auto font-mono text-[11px] md:text-xs selection:bg-primary/20">
+        <div className="p-4 max-h-[40vh] overflow-y-auto font-mono text-[11px] md:text-xs selection:bg-primary/20">
           {telemetryData ? (
              <pre className="text-muted-foreground">{JSON.stringify(telemetryData, null, 2)}</pre>
           ) : (

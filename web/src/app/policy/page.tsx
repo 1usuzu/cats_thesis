@@ -77,8 +77,7 @@ export default function PolicyPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-            <ShieldCheck className="size-6 text-emerald-500" />
+          <h1 className="text-2xl font-semibold tracking-tight">
             {t("nav_policy")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -200,7 +199,7 @@ export default function PolicyPage() {
               <div className="text-emerald-600/80 dark:text-emerald-400/80 text-sm mt-0.5">{t("opa_stable")}</div>
             </div>
           </div>
-          <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-card max-h-[60vh] flex flex-col">
+          <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-card max-h-[40vh] flex flex-col">
             <div className="p-3 border-b border-border bg-secondary/30 flex items-center gap-2 sticky top-0">
               <FileCode2 className="size-4 text-muted-foreground" />
               <h3 className="font-semibold text-sm">{t("active_policy_deployed")}</h3>
