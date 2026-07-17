@@ -12,6 +12,7 @@ T = TypeVar("T")
 class ChatRequest(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=8192, description="User prompt for LLM inference")
     request_tag: str = Field("default", description="Routing hint: 'default', 'fast_ok', or 'high_quality'")
+    strategy: str = Field("PROPOSED", description="Routing strategy requested by user")
 
 
 class QualitySampleRequest(BaseModel):

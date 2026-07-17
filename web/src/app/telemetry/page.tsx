@@ -48,7 +48,7 @@ export default function TelemetryPage() {
   const proxy_val = Object.keys(state).length > 0 ? "ACTIVE" : "UNKNOWN";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("nav_telemetry")}</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -56,7 +56,7 @@ export default function TelemetryPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="text-sm font-medium text-muted-foreground">{t("gw_queue")}</div>
           <div className="mt-2 text-xl font-bold text-foreground">
@@ -94,7 +94,7 @@ export default function TelemetryPage() {
              Live
            </div>
         </div>
-        <div className="p-4 bg-background h-[500px] font-mono text-xs text-muted-foreground overflow-y-auto">
+        <div className="p-3 bg-background h-80 font-mono text-xs text-muted-foreground overflow-y-auto">
           {telemetryData ? (
              <pre>{JSON.stringify(telemetryData, null, 2)}</pre>
           ) : (

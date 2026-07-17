@@ -3,8 +3,7 @@ services:
   # === LLM INFERENCE NODES ===
 
   cloud-node:
-    image: ollama/ollama:latest
-    runtime: nvidia
+    image: ollama/ollama:0.31.2
     environment:
       - OLLAMA_NUM_PARALLEL=2
       - OLLAMA_MAX_QUEUE=50
@@ -28,16 +27,11 @@ services:
       start_period: 120s
     deploy:
       resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
         limits:
-          cpus: "6.0"
+          cpus: "4.0"
 
   edge-node:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.31.2
     environment:
       - OLLAMA_NUM_PARALLEL=2
       - OLLAMA_MAX_QUEUE=50
@@ -62,12 +56,12 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "6.0"
+          cpus: "4.0"
 
   # === NETWORK EMULATION ===
 
   toxiproxy:
-    image: ghcr.io/shopify/toxiproxy:latest
+    image: ghcr.io/shopify/toxiproxy:2.12.0
     ports:
       - "8474:8474"
       - "8001:8001"
@@ -94,7 +88,7 @@ services:
   # === POLICY ENGINE ===
 
   opa:
-    image: openpolicyagent/opa:latest
+    image: openpolicyagent/opa:1.18.2
     command: run --server --addr :8181 --log-level error
     volumes:
       - ./safety/policies:/policies:ro
@@ -141,6 +135,22 @@ services:
           cpus: "2.0"
           memory: 512M
 
+  # === LITELLM PROXY ===
+
+  litellm-proxy:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm-proxy
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    command: [ "--config", "/app/config.yaml", "--port", "4000" ]
+    networks:
+      - data-plane
+      - control-plane
+
   # === GATEWAY (Ingress) ===
 
   gateway:
@@ -155,6 +165,8 @@ services:
       - EDGE_INFERENCE_URL=http://toxiproxy:8002
       - CLOUD_METRICS_URL=http://cloud-node:11434
       - EDGE_METRICS_URL=http://edge-node:11434
+      - USE_REAL_CLOUD_API=${USE_REAL_CLOUD_API:-false}
+      - LITELLM_PROXY_URL=http://litellm-proxy:4000
     ports:
       - "8000:8000"
     networks:
@@ -174,7 +186,7 @@ services:
       resources:
         limits:
           cpus: "2.0"
-          memory: 256M
+          memory: 512M
 
 
   # === WEB UI (Next.js) ===
@@ -197,16 +209,31 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://localhost:3000" ]
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:3000" ]
       interval: 15s
       timeout: 5s
       retries: 3
       start_period: 10s
 
+  # === INTERNET TUNNEL ===
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: http web:3000
+    ports:
+      - "4040:4040"
+    networks:
+      - data-plane
+    depends_on:
+      web:
+        condition: service_healthy
+
   # === TELEMETRY ===
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.13.0
     volumes:
       - ./telemetry/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -226,7 +253,7 @@ services:
       retries: 3
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.1.0
     volumes:
       - ./telemetry/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana-data:/var/lib/grafana

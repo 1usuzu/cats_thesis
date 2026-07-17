@@ -8,44 +8,33 @@ import { useI18n } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 export function Header() {
   const { setTheme, theme } = useTheme();
   const { lang, setLang, t } = useI18n();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
   
-  const { apiKey, setApiKey, strategy, setStrategy, requestTag, setRequestTag } = useAppStore();
+  const { apiKey, setApiKey, strategy, setStrategy, requestTag, setRequestTag, clearMessages, clearTelemetryRecords } = useAppStore();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
-  const handleStrategyChange = async (newStrategy: string) => {
-    try {
-      const res = await fetch("/api/strategy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": apiKey
-        },
-        body: JSON.stringify({ strategy: newStrategy })
-      });
+  const handleStrategyChange = (newStrategy: string) => {
+    setStrategy(newStrategy);
+  };
 
-      if (res.status === 401 || res.status === 403) {
-        toast.error("Invalid API Key. Please update your API Key.");
-        return;
-      }
-
-      if (res.ok) {
-        setStrategy(newStrategy);
-        toast.success(`Strategy updated to ${newStrategy}`);
-      } else {
-        toast.error("Failed to update strategy");
-      }
-    } catch {
-      toast.error("Network error while updating strategy");
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    clearMessages();
+    clearTelemetryRecords();
+    router.push("/login");
   };
 
   return (
@@ -110,6 +99,14 @@ export function Header() {
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </button>
         )}
+        
+        <button 
+          onClick={handleLogout}
+          className="text-destructive hover:text-destructive-foreground hover:bg-destructive transition-colors flex items-center justify-center size-8 rounded-md"
+          title="Logout"
+        >
+          <LogOut className="size-4" />
+        </button>
       </div>
     </header>
   );

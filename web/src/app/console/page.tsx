@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
-
 export default function ConsolePage() {
   const { t } = useI18n();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [strategy, setStrategy] = useState("PROPOSED");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { 
@@ -57,7 +57,8 @@ export default function ConsolePage() {
         },
         body: JSON.stringify({
           prompt: userPrompt,
-          request_tag: requestTag
+          request_tag: requestTag,
+          strategy: strategy
         }),
       });
 

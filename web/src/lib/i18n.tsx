@@ -63,6 +63,9 @@ const translations: Translations = {
     "cost_desc": "Cost breakdown and financial metrics for routing decisions.",
     "cloud_exp_cost": "Cloud Expected Cost",
     "edge_exp_cost": "Edge Expected Cost",
+    "optimal_route": "Optimal Route (by Score)",
+    "optimal_condition_met": "Optimal Condition Met",
+    "optimal_condition_failed": "Optimal Condition Failed (Safety Override)",
   },
   VI: {
     "nav_overview": "Tổng Quan",
@@ -116,6 +119,9 @@ const translations: Translations = {
     "cost_desc": "Chi tiết phân bổ chi phí dựa trên xác suất Retry & SLA.",
     "cloud_exp_cost": "Chi Phí Kỳ Vọng (Cloud)",
     "edge_exp_cost": "Chi Phí Kỳ Vọng (Edge)",
+    "optimal_route": "Điều Kiện Tuyến Tối Ưu",
+    "optimal_condition_met": "Thỏa mãn (Dựa trên điểm số cao nhất)",
+    "optimal_condition_failed": "Bị Từ Chối (Do vi phạm OPA/An toàn)",
   },
 };
 

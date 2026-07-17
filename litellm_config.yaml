@@ -1,0 +1,5 @@
+model_list:
+  - model_name: qwen2.5:7b
+    litellm_params:
+      model: gemini/gemini-flash-latest
+      api_key: os.environ/GEMINI_API_KEY

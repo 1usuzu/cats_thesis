@@ -15,12 +15,18 @@ class GatewaySettings(BaseSettings):
     cloud_metrics_url: str = "http://cloud-node:11434"
     edge_metrics_url: str = "http://edge-node:11434"
 
+    # LiteLLM Proxy / Real Cloud
+    use_real_cloud_api: bool = False
+    litellm_proxy_url: str = "http://litellm-proxy:4000"
+
     # Model names (must match entrypoint.sh)
     cloud_model: str = "qwen2.5:7b"
     edge_inference_model: str = "qwen2.5:1.5b"
 
     # SLA
     sla_target_ms: int = 500
+    sla_target_ms_fast: int = 250
+    sla_target_ms_hq: int = 1500
 
     # Emergency Fallback
     emergency_override_enabled: bool = False

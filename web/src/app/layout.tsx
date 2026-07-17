@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fira_Code } from "next/font/google";
+import { Be_Vietnam_Pro, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -7,14 +7,15 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "sonner";
 
-const inter = Inter({
+const fontSans = Be_Vietnam_Pro({
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
 });
 
-const firaCode = Fira_Code({
+const fontMono = JetBrains_Mono({
   variable: "--font-mono",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${firaCode.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${fontSans.variable} ${fontMono.variable}`}>
       <body className="h-screen bg-background text-foreground flex overflow-hidden antialiased">
         <ThemeProvider
           attribute="class"

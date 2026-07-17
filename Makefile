@@ -1,4 +1,4 @@
-.PHONY: setup test lint format docker-up docker-down
+.PHONY: setup test lint format docker-up docker-up-cpu docker-down docker-pre-pull
 
 setup:
 	pip install -e ".[dev]"
@@ -19,7 +19,13 @@ format:
 	ruff format .
 
 docker-up:
-	docker-compose up -d
+	docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
+
+docker-up-cpu:
+	docker compose up -d
 
 docker-down:
-	docker-compose down
+	docker compose down
+
+docker-pre-pull:
+	docker compose pull

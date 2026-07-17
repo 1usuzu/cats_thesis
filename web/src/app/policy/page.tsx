@@ -74,7 +74,7 @@ export default function PolicyPage() {
   const valDetails = ((proposal.validation_results as Record<string, unknown>)?.details as string) || "";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t("nav_policy")}</h1>
@@ -94,7 +94,7 @@ export default function PolicyPage() {
       </div>
 
       {hasProposal ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="rounded-md border border-border bg-card p-4">
             <h3 className="font-semibold text-sm mb-2">Proposal Validation Status: {valStatus}</h3>
             {valDetails && (
@@ -107,14 +107,14 @@ export default function PolicyPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-2">
               <h3 className="font-semibold text-sm">Active Rego Policy</h3>
-              <div className="rounded-md border border-border bg-card h-96 overflow-y-auto p-4">
-                <pre className="text-xs font-mono">{activePolicy}</pre>
+              <div className="rounded-md border border-border bg-card h-80 overflow-y-auto p-4">
+                <pre className="text-[11px] font-mono">{activePolicy}</pre>
               </div>
             </div>
             <div className="space-y-2">
               <h3 className="font-semibold text-sm text-blue-500">Proposed Rego Policy</h3>
-              <div className="rounded-md border border-border bg-card h-96 overflow-y-auto p-4">
-                <pre className="text-xs font-mono">{proposal.proposed_policy as string}</pre>
+              <div className="rounded-md border border-border bg-card h-80 overflow-y-auto p-4">
+                <pre className="text-[11px] font-mono">{proposal.proposed_policy as string}</pre>
               </div>
             </div>
           </div>
@@ -165,8 +165,8 @@ export default function PolicyPage() {
           </div>
           <div className="space-y-2">
             <h3 className="font-semibold text-sm">Active Rego Policy</h3>
-            <div className="rounded-md border border-border bg-card h-[500px] overflow-y-auto p-4">
-              <pre className="text-xs font-mono">{activePolicy}</pre>
+            <div className="rounded-md border border-border bg-card h-96 overflow-y-auto p-4">
+              <pre className="text-[11px] font-mono">{activePolicy}</pre>
             </div>
           </div>
         </div>

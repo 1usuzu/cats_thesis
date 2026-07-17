@@ -142,7 +142,10 @@ async def health_ready():
     """Readiness probe checking dependencies."""
     checks = {}
     try:
-        resp = await shared_http_client.client.get(f"{settings.cloud_metrics_url}/api/tags", timeout=2.0)
+        if settings.use_real_cloud_api:
+            resp = await shared_http_client.client.get(f"{settings.litellm_proxy_url}/health", timeout=2.0)
+        else:
+            resp = await shared_http_client.client.get(f"{settings.cloud_metrics_url}/api/tags", timeout=2.0)
         checks["cloud_node"] = resp.status_code == 200
     except Exception:
         checks["cloud_node"] = False
@@ -180,16 +183,6 @@ async def health_sites():
     return {"states": circuit_breakers.get_states()}
 
 
-class StrategyUpdate(BaseModel):
-    strategy: str
-
-@app.post("/admin/strategy")
-async def update_strategy(req: StrategyUpdate):
-    """Dynamically update routing strategy in memory."""
-    settings.benchmark_strategy = req.strategy
-    logger.info("Benchmark strategy updated via admin endpoint", new_strategy=req.strategy)
-    return {"status": "ok", "strategy": settings.benchmark_strategy}
-
 
 @app.post("/v1/chat", response_model=APIResponse[ChatResponse])
 async def chat(req: ChatRequest):
@@ -198,7 +191,7 @@ async def chat(req: ChatRequest):
     decision = "cloud"
 
     routing_analysis = None
-    if settings.benchmark_strategy == "PROPOSED":
+    if req.strategy == "PROPOSED":
         try:
             cb_states = circuit_breakers.get_states()
             res = await shared_http_client.client.post(
@@ -230,16 +223,16 @@ async def chat(req: ChatRequest):
                         meta={"detail": str(e), "orchestrator_unavailable": True}
                     ).model_dump()
                 )
-    elif settings.benchmark_strategy == "BASELINE-1":
+    elif req.strategy == "BASELINE-1":
         decision = next(rr_counter)
-    elif settings.benchmark_strategy == "BASELINE-2":
+    elif req.strategy == "BASELINE-2":
         decision = "cloud"
-    elif settings.benchmark_strategy == "BASELINE-3":
+    elif req.strategy == "BASELINE-3":
         decision = "edge"
 
     # Circuit Breaker check
     cb = circuit_breakers.get(decision)
-    if settings.benchmark_strategy != "PROPOSED":
+    if req.strategy != "PROPOSED":
         if not cb.can_execute():
             logger.warning(f"Circuit for {decision} is OPEN. Failing over.")
             decision = "edge" if decision == "cloud" else "cloud"
@@ -250,9 +243,20 @@ async def chat(req: ChatRequest):
                     content=APIResponse(error="Both inference sites are currently unavailable").model_dump()
                 )
 
-    target_url = _build_inference_url(decision)
-    model_name = _get_model(decision)
-    payload = {"model": model_name, "prompt": req.prompt, "stream": False}
+    if decision == "cloud" and settings.use_real_cloud_api:
+        target_url = f"{settings.litellm_proxy_url}/v1/chat/completions"
+        model_name = settings.cloud_model
+        display_model = "gemini-1.5-flash (Real API)"
+        payload = {
+            "model": model_name,
+            "messages": [{"role": "user", "content": req.prompt}],
+            "stream": False
+        }
+    else:
+        target_url = _build_inference_url(decision)
+        model_name = _get_model(decision)
+        display_model = model_name
+        payload = {"model": model_name, "prompt": req.prompt, "stream": False}
 
     async with in_flight_lock:
         in_flight[decision] += 1
@@ -284,19 +288,28 @@ async def chat(req: ChatRequest):
         e_tot = total_inference_ms if decision == "edge" else 0.0
         asyncio.create_task(_push_metrics(c_tot, e_tot))
 
+        resp_json = response.json()
+        if decision == "cloud" and settings.use_real_cloud_api:
+            try:
+                response_text = resp_json["choices"][0]["message"]["content"]
+            except KeyError:
+                response_text = str(resp_json)
+        else:
+            response_text = resp_json.get("response", "")
+
         chat_resp = ChatResponse(
-            response=response.json().get("response"),
+            response=response_text,
             route=RouteInfo(
                 site=decision,
-                model=model_name,
-                strategy=settings.benchmark_strategy,
+                model=display_model,
+                strategy=req.strategy,
                 total_inference_ms=total_inference_ms
             )
         )
 
         logger.info("Request routed successfully", site=decision, total_inference_ms=total_inference_ms)
 
-        meta_data = {"strategy": settings.benchmark_strategy}
+        meta_data = {"strategy": req.strategy}
         if routing_analysis:
             meta_data["routing_analysis"] = routing_analysis
 

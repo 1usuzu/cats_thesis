@@ -21,32 +21,46 @@ router = APIRouter(tags=["quality"])
     summary="Dual-route prompt for ROUGE-L quality comparison",
 )
 async def quality_sample(req: QualitySampleRequest):
-    cloud_url = f"{settings.cloud_inference_url}/api/generate"
-    edge_url = f"{settings.edge_inference_url}/api/generate"
-
-    cloud_payload = {
-        "model": settings.cloud_model,
-        "prompt": req.prompt,
-        "stream": False,
-    }
+    if settings.use_real_cloud_api:
+        cloud_url = f"{settings.litellm_proxy_url}/v1/chat/completions"
+        cloud_payload = {
+            "model": settings.cloud_model,
+            "messages": [{"role": "user", "content": req.prompt}],
+            "stream": False,
+        }
+    else:
+        cloud_url = f"{settings.cloud_inference_url}/api/generate"
+        cloud_payload = {
+            "model": settings.cloud_model,
+            "prompt": req.prompt,
+            "stream": False,
+        }
     edge_payload = {
         "model": settings.edge_inference_model,
         "prompt": req.prompt,
         "stream": False,
     }
 
-    async def call_node(url: str, payload: dict) -> tuple[str | None, int]:
+    async def call_node(url: str, payload: dict, is_openai: bool = False) -> tuple[str | None, int]:
         start = time.time()
         try:
             resp = await shared_http_client.client.post(url, json=payload)
             resp.raise_for_status()
             total_inference_ms = round((time.time() - start) * 1000)
-            return resp.json().get("response"), total_inference_ms
+            data = resp.json()
+            if is_openai:
+                try:
+                    content = data["choices"][0]["message"]["content"]
+                except KeyError:
+                    content = str(data)
+            else:
+                content = data.get("response")
+            return content, total_inference_ms
         except Exception:
             return None, 0
 
-    cloud_task = asyncio.create_task(call_node(cloud_url, cloud_payload))
-    edge_task = asyncio.create_task(call_node(edge_url, edge_payload))
+    cloud_task = asyncio.create_task(call_node(cloud_url, cloud_payload, is_openai=settings.use_real_cloud_api))
+    edge_task = asyncio.create_task(call_node(edge_url, edge_payload, is_openai=False))
 
     cloud_resp, cloud_total_inference_ms = await cloud_task
     edge_resp, edge_total_inference_ms = await edge_task
